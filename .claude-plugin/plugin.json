@@ -1,0 +1,23 @@
+{
+  "name": "draw-io",
+  "version": "1.0.0",
+  "description": "Claude Code skill for generating high-quality draw.io diagrams with proper font settings, arrow placement, and Japanese text support",
+  "author": {
+    "name": "ekusiadadus",
+    "url": "https://github.com/ekusiadadus"
+  },
+  "homepage": "https://github.com/ekusiadadus/draw-mcp",
+  "repository": "https://github.com/ekusiadadus/draw-mcp",
+  "license": "MIT",
+  "keywords": [
+    "draw.io",
+    "diagrams",
+    "flowchart",
+    "architecture",
+    "xml",
+    "visualization",
+    "japanese",
+    "claude-code",
+    "skill"
+  ]
+}

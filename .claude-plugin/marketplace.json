@@ -1,0 +1,18 @@
+{
+  "name": "draw-mcp",
+  "owner": {
+    "name": "ekusiadadus",
+    "email": "ekusiadadus@example.com"
+  },
+  "plugins": [
+    {
+      "name": "draw-io",
+      "source": ".",
+      "description": "Generate high-quality draw.io diagrams with Claude Code. Handles font settings, arrow layering, Japanese text, and PNG export validation.",
+      "version": "1.0.0",
+      "author": {
+        "name": "ekusiadadus"
+      }
+    }
+  ]
+}

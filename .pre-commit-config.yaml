@@ -1,0 +1,98 @@
+repos:
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+
+  # Python code formatting
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  # Python import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  # Python linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: ['--max-line-length=100', '--ignore=E203,W503']
+
+  # Local hooks
+  - repo: local
+    hooks:
+      # Validate draw.io files
+      - id: validate-drawio
+        name: Validate draw.io XML
+        entry: python -c "
+import sys
+import xml.etree.ElementTree as ET
+import re
+
+errors = []
+for filepath in sys.argv[1:]:
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        root = ET.fromstring(content)
+
+        # Check fontFamily in text elements
+        for cell in root.findall('.//mxCell'):
+            style = cell.get('style', '')
+            value = cell.get('value', '')
+            if value and 'fontFamily=' not in style:
+                cell_id = cell.get('id', 'unknown')
+                errors.append(f'{filepath}: Cell {cell_id} missing fontFamily')
+
+        # Check font size
+        for cell in root.findall('.//mxCell'):
+            style = cell.get('style', '')
+            match = re.search(r'fontSize=(\d+)', style)
+            if match and int(match.group(1)) < 14:
+                cell_id = cell.get('id', 'unknown')
+                errors.append(f'{filepath}: Cell {cell_id} has small font size')
+
+    except ET.ParseError as e:
+        errors.append(f'{filepath}: XML parse error - {e}')
+    except Exception as e:
+        errors.append(f'{filepath}: Error - {e}')
+
+if errors:
+    for err in errors:
+        print(err)
+    sys.exit(1)
+"
+        language: python
+        files: \.drawio$
+        pass_filenames: true
+
+      # Convert draw.io to PNG
+      - id: convert-drawio-to-png
+        name: Convert draw.io to PNG
+        entry: bash scripts/convert-drawio-to-png.sh
+        language: system
+        files: \.drawio$
+        pass_filenames: true
+        stages: [commit]
+
+      # Run pytest for draw.io skill tests
+      - id: pytest-drawio
+        name: Run draw.io skill tests
+        entry: python -m pytest tests/test_drawio_skill.py -v --tb=short
+        language: python
+        pass_filenames: false
+        always_run: true
+        additional_dependencies: [pytest]
