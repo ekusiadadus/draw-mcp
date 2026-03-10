@@ -2,9 +2,11 @@
 
 import argparse
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from drawio_validator.output import format_json, format_text
+from drawio_validator.preset import load_preset
 from drawio_validator.rules import Mode
 from drawio_validator.severity import Severity
 from drawio_validator.validator import validate
@@ -35,6 +37,12 @@ def main(argv: list[str] | None = None) -> int:
         default="standard",
         help="Validation mode (default: standard)",
     )
+    parser.add_argument(
+        "--preset",
+        type=Path,
+        default=None,
+        help="Path to a preset YAML file for validation profile checks",
+    )
 
     args = parser.parse_args(argv)
 
@@ -53,6 +61,11 @@ def main(argv: list[str] | None = None) -> int:
     }
     validation_mode = mode_map[args.mode]
 
+    # Load preset if specified
+    preset = None
+    if args.preset:
+        preset = load_preset(args.preset)
+
     has_errors = False
     all_output: list[str] = []
 
@@ -64,6 +77,16 @@ def main(argv: list[str] | None = None) -> int:
 
         xml_content = filepath.read_text(encoding="utf-8")
         findings = validate(xml_content, mode=validation_mode)
+
+        # Apply preset validation if specified
+        if preset:
+            from drawio_validator.preset import validate_against_preset
+
+            try:
+                root = ET.fromstring(xml_content)
+                findings.extend(validate_against_preset(root, preset))
+            except ET.ParseError:
+                pass  # XML parse errors already captured by validate()
 
         error_findings = [f for f in findings if f.severity == Severity.ERROR]
         if error_findings:
