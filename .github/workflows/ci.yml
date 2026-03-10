@@ -27,7 +27,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Lint with black
-        run: black --check src/ tests/
+        run: black --check --target-version py310 src/ tests/
 
       - name: Sort imports with isort
         run: isort --check-only src/ tests/

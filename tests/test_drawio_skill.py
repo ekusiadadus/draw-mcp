@@ -12,7 +12,6 @@ This module validates that draw.io XML files conform to the skill's best practic
 - Edge routing (node spacing)
 """
 
-import os
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -90,9 +89,7 @@ class DrawioValidator:
             if "text" in style or value:
                 if "fontFamily=" not in style:
                     cell_id = cell.get("id", "unknown")
-                    self.errors.append(
-                        f"Cell '{cell_id}' has text but missing fontFamily in style"
-                    )
+                    self.errors.append(f"Cell '{cell_id}' has text but missing fontFamily in style")
 
     def validate_font_size(self) -> None:
         """Validate font sizes are adequate for readability."""
@@ -156,7 +153,7 @@ class DrawioValidator:
                 continue
 
             # Count Japanese characters (Hiragana, Katakana, Kanji)
-            japanese_chars = len(re.findall(r'[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]', value))
+            japanese_chars = len(re.findall(r"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]", value))
 
             if japanese_chars == 0:
                 continue
@@ -179,9 +176,7 @@ class DrawioValidator:
         if mxgraph_model is not None:
             page = mxgraph_model.get("page", "1")
             if page != "0":
-                self.warnings.append(
-                    'mxGraphModel should have page="0" for transparent background'
-                )
+                self.warnings.append('mxGraphModel should have page="0" for transparent background')
 
     def validate_node_spacing(self) -> None:
         """Validate that nodes have sufficient spacing between them."""
@@ -205,7 +200,7 @@ class DrawioValidator:
             vertices.append({"id": cell_id, "x": x, "y": y, "w": w, "h": h})
 
         for i, v1 in enumerate(vertices):
-            for v2 in vertices[i + 1:]:
+            for v2 in vertices[i + 1 :]:
                 cx1 = v1["x"] + v1["w"] / 2
                 cy1 = v1["y"] + v1["h"] / 2
                 cx2 = v2["x"] + v2["w"] / 2
@@ -250,9 +245,7 @@ class DrawioValidator:
                 self.errors.append("Found mxCell without id attribute")
                 continue
             if cell_id in seen_ids:
-                self.errors.append(
-                    f"Duplicate id '{cell_id}' found in mxCell elements"
-                )
+                self.errors.append(f"Duplicate id '{cell_id}' found in mxCell elements")
             seen_ids[cell_id] = True
 
 
@@ -260,7 +253,7 @@ class DrawioValidator:
 @pytest.fixture
 def valid_drawio_xml() -> str:
     """Return a valid draw.io XML for testing."""
-    return '''<?xml version="1.0" encoding="UTF-8"?>
+    return """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
@@ -280,13 +273,13 @@ def valid_drawio_xml() -> str:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
 
 
 @pytest.fixture
 def invalid_drawio_xml() -> str:
     """Return an invalid draw.io XML for testing."""
-    return '''<?xml version="1.0" encoding="UTF-8"?>
+    return """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800">
@@ -306,7 +299,7 @@ def invalid_drawio_xml() -> str:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
 
 
 class TestDrawioValidator:
@@ -361,7 +354,7 @@ class TestDrawioValidator:
 
     def test_double_hyphen_in_comment_detected(self) -> None:
         """Test that double hyphens in XML comments are detected."""
-        xml_with_double_hyphen = '''<?xml version="1.0" encoding="UTF-8"?>
+        xml_with_double_hyphen = """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
@@ -376,7 +369,7 @@ class TestDrawioValidator:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
         validator = DrawioValidator(xml_with_double_hyphen)
         errors, warnings = validator.validate_all()
 
@@ -393,7 +386,7 @@ class TestDrawioValidator:
 
     def test_duplicate_ids_detected(self) -> None:
         """Test that duplicate IDs are detected."""
-        xml_with_dup_ids = '''<?xml version="1.0" encoding="UTF-8"?>
+        xml_with_dup_ids = """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
@@ -411,7 +404,7 @@ class TestDrawioValidator:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
         validator = DrawioValidator(xml_with_dup_ids)
         errors, warnings = validator.validate_all()
 
@@ -420,7 +413,7 @@ class TestDrawioValidator:
 
     def test_container_missing_pointer_events(self) -> None:
         """Test that containers without pointerEvents=0 are warned."""
-        xml_with_container = '''<?xml version="1.0" encoding="UTF-8"?>
+        xml_with_container = """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
@@ -435,7 +428,7 @@ class TestDrawioValidator:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
         validator = DrawioValidator(xml_with_container)
         errors, warnings = validator.validate_all()
 
@@ -444,7 +437,7 @@ class TestDrawioValidator:
 
     def test_swimlane_allows_no_pointer_events(self) -> None:
         """Test that swimlane containers do not require pointerEvents=0."""
-        xml_with_swimlane = '''<?xml version="1.0" encoding="UTF-8"?>
+        xml_with_swimlane = """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
@@ -459,7 +452,7 @@ class TestDrawioValidator:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
         validator = DrawioValidator(xml_with_swimlane)
         errors, warnings = validator.validate_all()
 
@@ -468,7 +461,7 @@ class TestDrawioValidator:
 
     def test_node_spacing_too_close(self) -> None:
         """Test that nodes placed too close together are warned."""
-        xml_close_nodes = '''<?xml version="1.0" encoding="UTF-8"?>
+        xml_close_nodes = """<?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="Electron">
   <diagram name="Page-1" id="test">
     <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
@@ -486,7 +479,7 @@ class TestDrawioValidator:
       </root>
     </mxGraphModel>
   </diagram>
-</mxfile>'''
+</mxfile>"""
         validator = DrawioValidator(xml_close_nodes)
         errors, warnings = validator.validate_all()
 
@@ -562,8 +555,9 @@ class TestSkillMdFormat:
         name = name_match.group(1).strip()
 
         # Name should be lowercase with hyphens only
-        assert re.match(r'^[a-z0-9-]+$', name), \
-            f"Name '{name}' should only contain lowercase letters, numbers, and hyphens"
+        assert re.match(
+            r"^[a-z0-9-]+$", name
+        ), f"Name '{name}' should only contain lowercase letters, numbers, and hyphens"
 
 
 class TestPluginFiles:

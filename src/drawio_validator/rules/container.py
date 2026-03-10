@@ -85,7 +85,7 @@ def check_children_bounds(root: ET.Element) -> List[Finding]:
                 Finding(
                     rule_id="container/children-bounds",
                     severity=Severity.WARNING,
-                    message=f"Child extends beyond parent container bounds",
+                    message="Child extends beyond parent container bounds",
                     cell_id=cell_id,
                     suggestion="Adjust child position/size or enlarge the container",
                 )

@@ -1,6 +1,5 @@
 """Style rules: trailing semicolon, boolean 0/1, typo detection, fontFamily."""
 
-import re
 import xml.etree.ElementTree as ET
 from typing import List
 
@@ -211,7 +210,10 @@ def check_boolean_values(root: ET.Element) -> List[Finding]:
                         severity=Severity.ERROR,
                         message=f"Boolean key '{key}' uses '{value}', must use 0 or 1",
                         cell_id=cell_id,
-                        suggestion=f"Change {key}={value} to {key}={'1' if value.lower() == 'true' else '0'}",
+                        suggestion=(
+                            f"Change {key}={value} to "
+                            f"{key}={'1' if value.lower() == 'true' else '0'}"
+                        ),
                     )
                 )
     return findings

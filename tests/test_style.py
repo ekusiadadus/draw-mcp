@@ -44,10 +44,14 @@ class TestBooleanValues:
         assert len(findings) == 0
 
     def test_invalid_boolean_true(self) -> None:
-        xml = """<mxfile><diagram name="P" id="d1"><mxGraphModel><root>
-            <mxCell id="0"/><mxCell id="1" parent="0"/>
-            <mxCell id="a" value="X" style="rounded=true;fontFamily=Noto Sans JP;" vertex="1" parent="1"/>
-        </root></mxGraphModel></diagram></mxfile>"""
+        xml = (
+            '<mxfile><diagram name="P" id="d1"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="a" value="X" '
+            'style="rounded=true;fontFamily=Noto Sans JP;" '
+            'vertex="1" parent="1"/>'
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         findings = check_boolean_values(_parse(xml))
         assert any(f.severity == Severity.ERROR and f.cell_id == "a" for f in findings)
 
@@ -58,10 +62,14 @@ class TestStyleTypos:
         assert len(findings) == 0
 
     def test_stroke_color_typo(self) -> None:
-        xml = """<mxfile><diagram name="P" id="d1"><mxGraphModel><root>
-            <mxCell id="0"/><mxCell id="1" parent="0"/>
-            <mxCell id="a" value="X" style="storkeColor=#000;fontFamily=Noto Sans JP;" vertex="1" parent="1"/>
-        </root></mxGraphModel></diagram></mxfile>"""
+        xml = (
+            '<mxfile><diagram name="P" id="d1"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="a" value="X" '
+            'style="storkeColor=#000;fontFamily=Noto Sans JP;" '
+            'vertex="1" parent="1"/>'
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         findings = check_style_typos(_parse(xml))
         assert any(f.severity == Severity.WARNING and "storkeColor" in f.message for f in findings)
 

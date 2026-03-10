@@ -2,18 +2,18 @@
 
 import re
 import xml.etree.ElementTree as ET
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
-from drawio_validator.severity import Finding, Severity
+import drawio_validator.rules.container  # noqa: F401
+import drawio_validator.rules.edge  # noqa: F401
+import drawio_validator.rules.export  # noqa: F401
 
 # Import all rule modules to trigger registration
 import drawio_validator.rules.structure  # noqa: F401
 import drawio_validator.rules.style  # noqa: F401
-import drawio_validator.rules.edge  # noqa: F401
-import drawio_validator.rules.container  # noqa: F401
 import drawio_validator.rules.text  # noqa: F401
-import drawio_validator.rules.export  # noqa: F401
 from drawio_validator.rules import get_all_rules
+from drawio_validator.severity import Finding, Severity
 
 
 def _check_double_hyphens(xml_content: str) -> List[Finding]:

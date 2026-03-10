@@ -98,7 +98,7 @@ def check_vertex_edge_exclusivity(root: ET.Element) -> List[Finding]:
                 Finding(
                     rule_id="structure/vertex-edge-exclusivity",
                     severity=Severity.ERROR,
-                    message=f"Cell has both vertex=1 and edge=1",
+                    message="Cell has both vertex=1 and edge=1",
                     cell_id=cell_id,
                     suggestion="A cell must be either a vertex or an edge, not both",
                 )

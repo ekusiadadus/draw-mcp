@@ -21,9 +21,7 @@ def check_japanese_width(root: ET.Element) -> List[Finding]:
         if not value:
             continue
 
-        japanese_chars = len(
-            re.findall(r"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]", value)
-        )
+        japanese_chars = len(re.findall(r"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]", value))
         if japanese_chars == 0:
             continue
 

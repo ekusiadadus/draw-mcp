@@ -1,8 +1,6 @@
-"""Tests for structure rules: root cells, hierarchy, vertex/edge exclusivity, parent refs, unique IDs."""
+"""Tests for structure rules: root cells, hierarchy, vertex/edge, parent refs, unique IDs."""
 
 import xml.etree.ElementTree as ET
-
-import pytest
 
 from drawio_validator.rules.structure import (
     check_hierarchy,
@@ -113,4 +111,6 @@ class TestCheckUniqueIds:
             <mxCell vertex="1" parent="1"/>
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_unique_ids(_parse(xml))
-        assert any(f.severity == Severity.ERROR and "without id" in f.message.lower() for f in findings)
+        assert any(
+            f.severity == Severity.ERROR and "without id" in f.message.lower() for f in findings
+        )

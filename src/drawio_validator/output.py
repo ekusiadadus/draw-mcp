@@ -27,7 +27,9 @@ def format_text(findings: List[Finding], min_severity: Severity = Severity.INFO)
     warn_count = sum(1 for f in filtered if f.severity == Severity.WARNING)
     info_count = sum(1 for f in filtered if f.severity == Severity.INFO)
 
-    summary = f"\n{len(filtered)} issue(s): {error_count} error, {warn_count} warning, {info_count} info"
+    summary = (
+        f"\n{len(filtered)} issue(s): {error_count} error, {warn_count} warning, {info_count} info"
+    )
     return "\n".join(lines) + summary
 
 

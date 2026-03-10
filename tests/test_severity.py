@@ -33,7 +33,9 @@ class TestFinding:
     """Test Finding frozen dataclass."""
 
     def test_finding_creation_minimal(self) -> None:
-        f = Finding(rule_id="structure/root-cells", severity=Severity.ERROR, message="Missing root cells")
+        f = Finding(
+            rule_id="structure/root-cells", severity=Severity.ERROR, message="Missing root cells"
+        )
         assert f.rule_id == "structure/root-cells"
         assert f.severity == Severity.ERROR
         assert f.message == "Missing root cells"

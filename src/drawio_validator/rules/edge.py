@@ -55,7 +55,7 @@ def check_edge_relative(root: ET.Element) -> List[Finding]:
                 Finding(
                     rule_id="edge/relative",
                     severity=Severity.ERROR,
-                    message="Edge geometry missing relative=\"1\"",
+                    message='Edge geometry missing relative="1"',
                     cell_id=cell_id,
                     suggestion='Add relative="1" to the mxGeometry element',
                 )
@@ -99,7 +99,10 @@ def check_arrowhead_segment(root: ET.Element) -> List[Finding]:
                 Finding(
                     rule_id="edge/arrowhead-segment",
                     severity=Severity.WARNING,
-                    message=f"Edge segment length {distance:.0f}px is less than {MIN_ARROWHEAD_SEGMENT}px minimum",
+                    message=(
+                        f"Edge segment length {distance:.0f}px is less "
+                        f"than {MIN_ARROWHEAD_SEGMENT}px minimum"
+                    ),
                     cell_id=cell_id,
                     suggestion="Increase spacing between source and target points",
                 )

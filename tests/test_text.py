@@ -56,10 +56,14 @@ class TestHtmlEscape:
         assert len(findings) == 0
 
     def test_unescaped_html_tags(self) -> None:
-        xml = """<mxfile><diagram name="P" id="d1"><mxGraphModel><root>
-            <mxCell id="0"/><mxCell id="1" parent="0"/>
-            <mxCell id="a" value="&lt;script&gt;alert(1)&lt;/script&gt;" style="html=1;" vertex="1" parent="1"/>
-        </root></mxGraphModel></diagram></mxfile>"""
+        xml = (
+            '<mxfile><diagram name="P" id="d1"><mxGraphModel><root>'
+            '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+            '<mxCell id="a" '
+            'value="&lt;script&gt;alert(1)&lt;/script&gt;" '
+            'style="html=1;" vertex="1" parent="1"/>'
+            "</root></mxGraphModel></diagram></mxfile>"
+        )
         findings = check_html_escape(_parse(xml))
         assert any(f.severity == Severity.WARNING and f.cell_id == "a" for f in findings)
 

@@ -1,9 +1,5 @@
 """Integration tests using fixture files and the full validator pipeline."""
 
-from pathlib import Path
-
-import pytest
-
 from drawio_validator.severity import Severity
 from drawio_validator.validator import validate, validate_all
 
@@ -37,7 +33,9 @@ class TestInvalidFixtures:
 
     def test_duplicate_ids_detected(self, invalid_duplicate_ids_xml: str) -> None:
         findings = validate(invalid_duplicate_ids_xml)
-        dup_errors = [f for f in findings if "duplicate" in f.message.lower() or "Duplicate" in f.message]
+        dup_errors = [
+            f for f in findings if "duplicate" in f.message.lower() or "Duplicate" in f.message
+        ]
         assert len(dup_errors) > 0, "Should detect duplicate IDs"
 
     def test_unescaped_html_warned(self, invalid_unescaped_html_xml: str) -> None:

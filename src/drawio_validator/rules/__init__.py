@@ -1,8 +1,7 @@
 """Rule registry for drawio-validator."""
 
-from typing import Callable, List
-
 import xml.etree.ElementTree as ET
+from typing import Callable, List
 
 from drawio_validator.severity import Finding
 
