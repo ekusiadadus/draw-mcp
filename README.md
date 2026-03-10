@@ -1,22 +1,35 @@
-# Claude Skill: draw.io Diagram Generator
+# draw-mcp — AI-Generated draw.io XML Quality Standard
 
-A Claude Code skill for generating high-quality draw.io diagrams with proper font settings, arrow placement, edge routing, containers, and Japanese text support.
+A Claude Code skill and CLI validator for generating high-quality draw.io diagrams. 23 validation rules, strict specification, and CI-ready tooling.
+
+## Positioning
+
+| Feature | draw-mcp | draw.io MCP Server | Mermaid.js |
+|---------|----------|-------------------|-----------|
+| Output | Native XML | Image/JSON | Text DSL |
+| Layout control | Pixel-perfect | Auto-layout | Auto-layout |
+| Japanese text | Full support | Limited | No control |
+| Validation | 23 rules, CI-ready | None | Syntax only |
+| Offline | Yes | Optional | Yes |
+| Best for | Production diagrams | Quick previews | Simple flows |
+
+**draw-mcp** is a Claude Code XML generation skill with strict validator and style guide. The official draw.io MCP server is complementary (use it for previews, Mermaid, CSV). draw-mcp focuses on **quality** for production diagrams.
 
 ## Features
 
-- **Font Management**: Ensures `fontFamily` is set on all text elements
-- **Arrow Layering**: Correct Z-order placement (arrows behind boxes)
-- **Edge Routing**: Node spacing, waypoints, connection point control, arrowhead spacing
-- **Containers/Groups**: Swimlane, group, and custom container support with proper parent-child containment
-- **Japanese Text Support**: Proper width allocation for CJK characters
-- **XML Well-Formedness**: Validates `--` in comments, unique IDs, escape characters
-- **PNG Validation**: Pre-commit hooks for automatic PNG generation
-- **MCP Integration**: Compatible with official [draw.io MCP server](https://github.com/jgraph/drawio-mcp)
-- **Best Practices**: Comprehensive checklist, 7 production-ready examples
+- **23 Validation Rules** across 6 categories (structure, style, edge, container, text, export)
+- **CLI Tool**: `draw-mcp-validate` with text/JSON output and severity filtering
+- **SKILL.md Specification v2.0**: Formal MUST/SHOULD/INFO rules
+- **Font Management**: Enforces `fontFamily` on all text elements
+- **Edge Routing**: Z-order, waypoints, connection points, arrowhead spacing
+- **Containers/Layers**: Swimlane, group, custom containers, multi-layer support
+- **Japanese Text**: Width allocation for CJK characters
+- **CI Integration**: GitHub Actions, pre-commit hooks, 96%+ test coverage
+- **8 Production Examples**: Flowcharts, architecture, containers, layers, edge routing
 
-## Installation
+## Quick Start
 
-### Plugin Installation (Recommended)
+### Plugin Installation
 
 ```bash
 # Via Claude Code marketplace
@@ -28,181 +41,127 @@ A Claude Code skill for generating high-quality draw.io diagrams with proper fon
 
 ### Manual Installation
 
-Clone to your Claude Code skills directory:
+```bash
+git clone https://github.com/ekusiadadus/draw-mcp ~/.claude/skills/draw-io
+```
+
+### CLI Validator
 
 ```bash
-# Global (personal use)
-git clone https://github.com/ekusiadadus/draw-mcp ~/.claude/skills/draw-io
+pip install -e ".[dev]"
 
-# Project-specific
-git clone https://github.com/ekusiadadus/draw-mcp .claude/skills/draw-io
+# Validate a file
+draw-mcp-validate diagram.drawio
+
+# JSON output
+draw-mcp-validate diagram.drawio --format json
+
+# Errors only
+draw-mcp-validate diagram.drawio --severity error
 ```
 
 ## Usage
 
-Once installed, Claude Code will automatically use this skill when you ask to create draw.io diagrams.
-
-### Example Prompts
+Once installed, Claude Code uses this skill automatically for draw.io diagrams.
 
 ```
 Create a simple flowchart showing: Start -> Process -> End
-
-Draw an architecture diagram with Web Server, API, and Database
-
-Create a microservices diagram with swimlane containers
-
-Create a sequence diagram for user login flow
+Draw an architecture diagram with swimlane containers
+Create a layered diagram with infrastructure and application layers
 ```
 
-### Manual Trigger
+## Validation Rules (23)
 
-If needed, you can explicitly request the skill:
-
-```
-Using the draw-io skill, create a flowchart for the authentication process
-```
-
-## MCP Integration (Optional)
-
-For inline previews or Mermaid.js support, use the official draw.io MCP server:
-
-| Method | Best For | Setup |
-|--------|----------|-------|
-| **MCP App Server** | Inline previews in chat | Add `https://mcp.draw.io/mcp` as remote MCP server |
-| **MCP Tool Server** | Desktop workflows | `npx @drawio/mcp` |
-| **This Skill** | Code-based workflows with full control | See Installation above |
-
-### Quick Decision Guide
-
-| Need | Approach |
-|------|----------|
-| Custom styling, precise positioning, Japanese text | XML (this skill) |
-| Flowchart, sequence, ER diagram | Mermaid.js via MCP |
-| Inline preview in chat | MCP App Server |
-
-## Requirements
-
-### draw.io CLI (for PNG export)
-
-**macOS:**
-```bash
-brew install --cask drawio
-```
-
-**Linux:**
-Download from [draw.io Desktop Releases](https://github.com/jgraph/drawio-desktop/releases)
-
-### Python (for tests and validation)
-
-```bash
-pip install pytest
-```
+| Module | Rules | Default Severity |
+|--------|-------|-----------------|
+| **structure** | root-cells, hierarchy, vertex-edge-exclusivity, parent-reference, unique-ids | ERROR |
+| **style** | trailing-semicolon, boolean-values, typo, font-family | Mixed |
+| **edge** | z-order, relative, arrowhead-segment, node-spacing | Mixed |
+| **container** | pointer-events, children-bounds, swimlane-start-size, collapsible | Mixed |
+| **text** | japanese-width, html-escape, font-size | Mixed |
+| **export** | page-setting, embed-diagram | Mixed |
 
 ## Project Structure
 
 ```
 draw-mcp/
-├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest
-│   └── marketplace.json     # Marketplace configuration
-├── skills/
-│   └── draw-io/
-│       ├── SKILL.md         # Main skill definition
-│       ├── reference.md     # XML reference (edge routing, containers, etc.)
-│       ├── examples.md      # 7 production-ready examples
-│       └── checklist.md     # Validation checklist (9 categories)
-├── scripts/
-│   └── convert-drawio-to-png.sh
-├── tests/
-│   └── test_drawio_skill.py # 20 test cases
-├── examples/
-│   └── sample-flowchart.drawio
-├── docs/
-│   └── RULE.md
-├── .pre-commit-config.yaml
-├── .gitignore
-├── LICENSE
-└── README.md
+├── src/drawio_validator/          # Validator package
+│   ├── __init__.py                # Version constant
+│   ├── severity.py                # Severity enum, Finding dataclass
+│   ├── validator.py               # Orchestrator
+│   ├── output.py                  # Text/JSON formatters
+│   ├── cli.py                     # CLI entry point
+│   └── rules/                     # 6 rule modules
+│       ├── structure.py           # 5 rules
+│       ├── style.py               # 4 rules
+│       ├── edge.py                # 4 rules
+│       ├── container.py           # 4 rules
+│       ├── text.py                # 3 rules
+│       └── export.py              # 2 rules
+├── skills/draw-io/                # Skill definition
+│   ├── SKILL.md                   # Formal specification v2.0
+│   ├── reference.md               # XML reference (layers, routing, containers)
+│   ├── examples.md                # 8 production-ready examples
+│   └── checklist.md               # Validation checklist (10 categories)
+├── tests/                         # 93 tests, 96%+ coverage
+│   ├── fixtures/                  # 9 XML fixture files
+│   ├── test_structure.py
+│   ├── test_style.py
+│   ├── test_edge.py
+│   ├── test_container.py
+│   ├── test_text.py
+│   ├── test_cli.py
+│   ├── test_integration.py
+│   ├── test_severity.py
+│   └── test_drawio_skill.py       # Legacy tests (backward compatible)
+├── .github/workflows/ci.yml       # GitHub Actions CI
+├── pyproject.toml                  # Build config (hatchling)
+├── .pre-commit-config.yaml         # Pre-commit hooks
+└── examples/
+    └── sample-flowchart.drawio
 ```
 
-## Key Rules
+## MCP Integration (Optional)
 
-### 1. Font Settings
+| Method | Best For | Setup |
+|--------|----------|-------|
+| **MCP App Server** | Inline previews | `https://mcp.draw.io/mcp` |
+| **MCP Tool Server** | Desktop workflows | `npx @drawio/mcp` |
+| **This Skill** | Production diagrams with full control | See Installation |
 
-```xml
-<mxGraphModel defaultFontFamily="Noto Sans JP" ...>
-<mxCell style="...fontFamily=Noto Sans JP;fontSize=18;..." />
-```
+## Requirements
 
-### 2. Arrow Placement (Z-Order)
-
-Arrows must be declared FIRST in XML to render behind other elements.
-
-### 3. Edge Routing
-
-- Space nodes at least 60px apart (prefer 200px horizontal / 120px vertical)
-- Use `exitX`/`exitY` and `entryX`/`entryY` to control connection sides
-- Ensure 20px+ straight segment before target for arrowheads
-- Add explicit waypoints where edges would overlap
-
-### 4. Containers
-
-```xml
-<!-- Swimlane (titled container) -->
-<mxCell style="swimlane;startSize=30;" vertex="1" parent="1">
-
-<!-- Children use RELATIVE coordinates -->
-<mxCell style="rounded=1;" vertex="1" parent="svc1">
-```
-
-### 5. Japanese Text Width
-
-Allocate 30-40px per Japanese character.
-
-### 6. XML Well-Formedness
-
-- Never use `--` inside XML comments
-- Escape special characters
-- All IDs must be unique
-
-### 7. PNG Verification
+- Python 3.10+
+- pytest (for tests)
+- draw.io CLI (for PNG export, optional)
 
 ```bash
-drawio -x -f png -s 2 -t -o diagram.png diagram.drawio
-```
+# macOS
+brew install --cask drawio
 
-## Pre-commit Hooks
-
-This project includes pre-commit hooks for:
-
-1. **XML Validation**: Check font settings, structure, and well-formedness
-2. **PNG Conversion**: Auto-generate PNG on commit
-3. **Python Tests**: Run 20 skill validation tests
-
-Setup:
-
-```bash
-pip install pre-commit
+# Development setup
+pip install -e ".[dev]"
 pre-commit install
 ```
 
 ## Running Tests
 
 ```bash
-# Run all tests
-pytest tests/ -v
+# All tests with coverage
+pytest tests/ -v --cov=drawio_validator --cov-report=term-missing
 
-# Run specific test file
-pytest tests/test_drawio_skill.py -v
+# Specific module
+pytest tests/test_structure.py -v
 ```
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Run tests: `pytest tests/ -v`
-5. Submit a pull request
+3. Write tests first (TDD)
+4. Implement to pass tests
+5. Run: `pytest tests/ -v --cov=drawio_validator`
+6. Submit a pull request
 
 ## License
 
@@ -212,28 +171,33 @@ MIT License - see [LICENSE](LICENSE)
 
 - [draw.io Desktop](https://github.com/jgraph/drawio-desktop)
 - [draw.io MCP Server (Official)](https://github.com/jgraph/drawio-mcp)
-- [@drawio/mcp (npm)](https://www.npmjs.com/package/@drawio/mcp)
 - [draw.io Style Reference](https://www.drawio.com/doc/faq/drawio-style-reference.html)
 - [draw.io XSD Schema](https://www.drawio.com/assets/mxfile.xsd)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)
 
 ## Changelog
 
+### v2.0.0 (2026-03-10)
+
+- **Validator overhaul**: 23 modular rules in 6 categories (structure, style, edge, container, text, export)
+- **CLI tool**: `draw-mcp-validate` with text/JSON output and severity filtering
+- **Package**: `pyproject.toml` with hatchling build, `pip install -e ".[dev]"`
+- **SKILL.md v2.0**: Formal specification with MUST/SHOULD/INFO levels
+- **Layers**: Full layer support in reference, examples, and checklist
+- **Test suite**: 93 tests at 96%+ coverage (up from 20 tests)
+- **CI**: GitHub Actions with Python 3.10-3.13 matrix, linting, coverage
+- **Pre-commit**: CLI-based validator replaces inline Python
+- **8 examples**: Added layer diagram example
+- **Positioning**: Clear complementary relationship with official MCP server
+
 ### v1.1.0 (2026-03-10)
 
-- Edge routing best practices (node spacing, waypoints, connection points, arrowhead spacing)
-- Container/group support (swimlane, group, custom containers with pointerEvents)
-- XML well-formedness validation (double hyphens, unique IDs)
-- Mermaid.js integration guide via official MCP server
-- 2 new production-ready examples (container architecture, edge routing)
-- 8 new test cases (20 total)
-- Updated checklist with 9 validation categories
-- Official draw.io style reference and XSD schema links
-- Expanded troubleshooting table
+- Edge routing best practices
+- Container/group support
+- XML well-formedness validation
+- Mermaid.js integration guide
+- 20 test cases
 
 ### v1.0.0 (2025-12-16)
 
 - Initial release
-- Core skill with font, arrow, and text handling
-- Pre-commit hooks for validation
-- Comprehensive documentation and examples

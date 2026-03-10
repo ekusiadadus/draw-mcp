@@ -1,6 +1,6 @@
 {
   "name": "draw-io",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Claude Code skill for generating high-quality draw.io diagrams with proper font settings, arrow placement, and Japanese text support",
   "author": {
     "name": "ekusiadadus",
