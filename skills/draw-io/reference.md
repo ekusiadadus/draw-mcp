@@ -402,6 +402,61 @@ Set `parent="containerId"` on child cells. Children use **relative coordinates**
 </mxCell>
 ```
 
+## Layers
+
+Layers allow separating diagram elements into independent visibility groups. Each layer is a cell with `parent="0"`.
+
+### Layer Structure
+
+```xml
+<root>
+  <mxCell id="0"/>                                        <!-- Root -->
+  <mxCell id="1" parent="0"/>                             <!-- Default layer -->
+  <mxCell id="layer-infra" value="Infrastructure" parent="0"/>  <!-- Custom layer -->
+  <mxCell id="layer-app" value="Application" parent="0"/>      <!-- Custom layer -->
+</root>
+```
+
+### Assigning Elements to Layers
+
+Set `parent` to the layer id:
+
+```xml
+<!-- This box belongs to the infrastructure layer -->
+<mxCell id="server1" value="Server"
+  style="rounded=1;fontFamily=Noto Sans JP;fontSize=18;"
+  vertex="1" parent="layer-infra">
+  <mxGeometry x="100" y="100" width="120" height="60" as="geometry"/>
+</mxCell>
+```
+
+### Layer Visibility
+
+Layers can be toggled in draw.io's Edit > Layers panel. Use layers for:
+- Background/foreground separation
+- Infrastructure vs application components
+- Draft annotations that can be hidden
+
+### Key Rules
+
+- Layer cells have `parent="0"` and are siblings of `id="1"`
+- Layer cells do not need `fontFamily` in their style
+- Children use absolute coordinates (not relative to layer position)
+- The default layer `id="1"` is always present
+
+### Style String Format
+
+Style strings follow a strict `key=value;` format with semicolons:
+
+```
+property1=value1;property2=value2;property3=value3;
+```
+
+**Rules:**
+- Always end with a trailing `;`
+- Boolean values use `0` or `1` (never `true`/`false`)
+- Use only valid draw.io style keys (typos are flagged by the validator)
+
 ## Mermaid.js Integration
 
 For simple diagrams, Mermaid.js syntax can be converted to draw.io format via the official MCP server or draw.io editor.

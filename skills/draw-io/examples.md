@@ -489,6 +489,64 @@ A diagram demonstrating explicit waypoints and connection point control to avoid
 </mxfile>
 ```
 
+## Example 8: Layered Diagram
+
+A diagram using multiple layers for infrastructure vs application separation.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron">
+  <diagram name="Layers" id="layers-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="layer-infra" value="Infrastructure" style="" parent="0"/>
+        <mxCell id="layer-app" value="Application" style="" parent="0"/>
+
+        <!-- Infrastructure layer elements -->
+        <mxCell id="e-infra"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#999999;"
+          edge="1" parent="layer-infra" source="vpc" target="subnet">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="vpc" value="VPC"
+          style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Noto Sans JP;fontSize=18;fillColor=#f5f5f5;strokeColor=#666666;"
+          vertex="1" parent="layer-infra">
+          <mxGeometry x="100" y="100" width="500" height="300" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="subnet" value="Subnet"
+          style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Noto Sans JP;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;"
+          vertex="1" parent="layer-infra">
+          <mxGeometry x="150" y="160" width="400" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- Application layer elements -->
+        <mxCell id="e-app"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+          edge="1" parent="layer-app" source="web" target="api">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="web" value="Web Server"
+          style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Noto Sans JP;fontSize=18;fillColor=#dae8fc;strokeColor=#6c8ebf;"
+          vertex="1" parent="layer-app">
+          <mxGeometry x="180" y="200" width="140" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="api" value="API Server"
+          style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Noto Sans JP;fontSize=18;fillColor=#d5e8d4;strokeColor=#82b366;"
+          vertex="1" parent="layer-app">
+          <mxGeometry x="380" y="200" width="140" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+```
+
 ## Usage Notes
 
 1. **Copy and Modify**: Use these examples as templates

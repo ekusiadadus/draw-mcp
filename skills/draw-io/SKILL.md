@@ -1,162 +1,297 @@
 ---
 name: draw-io
-description: Generate and edit draw.io diagrams in XML format with proper font settings, arrow placement, edge routing, containers, and Japanese text support. Use when creating flowcharts, architecture diagrams, sequence diagrams, or any visual diagrams in .drawio format. Supports Mermaid.js integration via official MCP server.
+description: Generate and validate draw.io diagrams in XML format. Strict quality rules for font settings, edge routing, containers, layers, and Japanese text. 23-rule validator with CLI. Use for flowcharts, architecture diagrams, sequence diagrams in .drawio format.
 ---
 
-# draw.io Diagram Generation Skill
+# draw.io XML Generation Specification v2.0
 
-## Overview
+## 1. Scope
 
-This skill enables Claude Code to generate high-quality draw.io diagrams by directly editing XML. It addresses common pitfalls when generating draw.io files programmatically, with support for edge routing, containers/groups, and Mermaid.js integration.
+This specification defines the rules for AI-generated draw.io XML files. It ensures consistent, high-quality output that renders correctly in draw.io desktop, web, and PNG export. Rules are categorized as:
 
-## Quick Decision Guide
+- **MUST** (Severity: ERROR) — Violations break rendering or structure
+- **SHOULD** (Severity: WARNING) — Violations degrade quality
+- **INFORMATIONAL** (Severity: INFO) — Suggestions for best practices
 
-| Need | Approach | When to Use |
-|------|----------|-------------|
-| Custom styling, precise positioning, Japanese text | **XML** (this skill) | Complex diagrams requiring full control |
-| Flowchart, sequence, ER diagram | **Mermaid.js** via MCP | Simple diagrams where layout control is not critical |
-| Inline preview in chat | **MCP App Server** (`mcp.draw.io/mcp`) | Quick visualization without file generation |
+All rules are enforced by the `draw-mcp-validate` CLI tool with 23 validation rules.
 
-## Quick Start
+## 2. Structural Rules (MUST)
 
-When creating a draw.io diagram:
+### 2.1 File Hierarchy
 
-1. Set `defaultFontFamily` in `mxGraphModel`
-2. Add `fontFamily=FontName;` to ALL text element styles
-3. Use `fontSize=18` or larger for readability
-4. Place arrows (edges) BEFORE boxes (vertices) in XML
-5. Allocate 30-40px width per Japanese character
-6. Set `page="0"` for transparent background
-7. Space nodes generously (200px horizontal / 120px vertical)
-8. **Never use `--` inside XML comments**
-9. Use containers (`swimlane`, `group`) for nested architecture diagrams
-10. Verify with PNG export
-
-## Core Rules
-
-### Font Settings
-
-```xml
-<!-- In mxGraphModel -->
-<mxGraphModel defaultFontFamily="Noto Sans JP" page="0" ...>
-
-<!-- In EVERY text element's style -->
-<mxCell style="text;fontFamily=Noto Sans JP;fontSize=18;..." />
+```
+mxfile > diagram > mxGraphModel > root > mxCell...
 ```
 
-### Arrow Placement (Z-Order)
+Every file MUST follow this hierarchy. The `mxfile` element is the root.
 
-Arrows must be declared FIRST to render behind other elements:
+### 2.2 Root Cells
+
+Two root cells MUST always be present:
+
+```xml
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>
+```
+
+Cell `id="0"` is the invisible root. Cell `id="1"` is the default layer with `parent="0"`.
+
+### 2.3 Parent References
+
+Every `mxCell` with a `parent` attribute MUST reference an existing cell id. Orphaned references cause rendering failures.
+
+### 2.4 Vertex/Edge Exclusivity
+
+A cell MUST NOT have both `vertex="1"` and `edge="1"`. It is either a shape or a connection, never both.
+
+### 2.5 Edge Geometry
+
+Edge `mxGeometry` MUST have `relative="1"`:
+
+```xml
+<mxCell id="e1" edge="1" parent="1" source="a" target="b"
+  style="edgeStyle=orthogonalEdgeStyle;">
+  <mxGeometry relative="1" as="geometry"/>
+</mxCell>
+```
+
+### 2.6 Unique IDs
+
+All `mxCell` elements MUST have unique `id` attributes.
+
+### 2.7 XML Well-Formedness
+
+- MUST NOT use `--` inside XML comments (illegal per XML spec)
+- MUST escape special characters in attribute values: `&amp;`, `&lt;`, `&gt;`, `&quot;`
+
+## 3. Style String Rules (MUST)
+
+### 3.1 Format
+
+Style strings use `key=value;` pairs with a trailing semicolon:
+
+```
+style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Noto Sans JP;fontSize=18;"
+```
+
+### 3.2 Boolean Values
+
+Boolean style keys MUST use `0` or `1`, never `true` or `false`:
+
+```xml
+<!-- CORRECT -->
+style="rounded=1;html=1;"
+
+<!-- WRONG -->
+style="rounded=true;html=false;"
+```
+
+### 3.3 fontFamily on All Text
+
+Every cell with a `value` attribute MUST include `fontFamily=FontName;` in its style:
+
+```xml
+<mxCell id="a" value="Label"
+  style="rounded=1;fontFamily=Noto Sans JP;fontSize=18;"
+  vertex="1" parent="1"/>
+```
+
+### 3.4 Font Size
+
+Minimum font size is **14px** (MUST). Recommended size is **18px** (SHOULD).
+
+### 3.5 Known Keys
+
+Use only valid draw.io style keys. Common typos (e.g., `storkeColor` for `strokeColor`) are detected and flagged.
+
+## 4. Layout Rules (SHOULD)
+
+### 4.1 Grid Alignment
+
+Align node positions to a 10px grid (multiples of 10).
+
+### 4.2 Node Spacing
+
+- Minimum spacing: **60px** between nodes
+- Recommended: **200px horizontal**, **120px vertical**
+
+### 4.3 Edge Final Segment
+
+The final straight segment of an edge MUST be at least **20px** for arrowheads to render cleanly.
+
+## 5. Edge Routing (SHOULD)
+
+### 5.1 Z-Order
+
+Edges SHOULD be declared before vertices in XML for correct Z-order (arrows behind shapes):
 
 ```xml
 <root>
-  <mxCell id="0" />
-  <mxCell id="1" parent="0" />
-
-  <!-- ARROWS FIRST (renders at back) -->
-  <mxCell id="arrow1" edge="1" ... />
-
-  <!-- BOXES AFTER (renders in front) -->
-  <mxCell id="box1" vertex="1" ... />
+  <mxCell id="0"/><mxCell id="1" parent="0"/>
+  <!-- EDGES FIRST -->
+  <mxCell id="e1" edge="1" .../>
+  <!-- VERTICES AFTER -->
+  <mxCell id="a" vertex="1" .../>
 </root>
 ```
 
-### Edge Routing
+### 5.2 Orthogonal Style
 
-draw.io has no built-in collision detection for edges. Plan carefully:
+Use `edgeStyle=orthogonalEdgeStyle` for right-angle connectors. Add `rounded=1` for cleaner bends.
 
-- Space nodes at least **60px** apart (prefer 200px horizontal / 120px vertical)
-- Use `exitX`/`exitY` and `entryX`/`entryY` (0-1) to control connection sides
-- Ensure at least **20px** straight segment before target for arrowheads
-- Add explicit **waypoints** when edges would overlap
-- Use `rounded=1` on edges for cleaner bends
-- Use `jettySize=auto` for better port spacing
+### 5.3 jettySize
 
-### Label-Arrow Spacing
+Use `jettySize=auto` for better port spacing on orthogonal edges.
 
-Labels must be at least 20px away from arrow lines:
+### 5.4 jumpStyle
+
+For crossing edges, use `jumpStyle=arc` or `jumpStyle=gap` to show crossings clearly.
+
+### 5.5 Waypoints
+
+Add explicit waypoints when edges would overlap:
 
 ```xml
-<!-- Arrow at Y=220, Label at Y=180 (40px above) - CORRECT -->
-<mxCell id="label" value="Process">
-  <mxGeometry y="180" width="60" height="20" />
+<mxGeometry relative="1" as="geometry">
+  <Array as="points">
+    <mxPoint x="300" y="150"/>
+  </Array>
+</mxGeometry>
+```
+
+### 5.6 Connection Points
+
+Use `exitX`/`exitY` and `entryX`/`entryY` (values 0-1) to control which side of a node an edge connects to. Spread connections across different sides to prevent overlap.
+
+## 6. Containers (SHOULD)
+
+### 6.1 Group Container
+
+Invisible grouping with no visual border:
+
+```xml
+<mxCell id="grp1" style="group;" vertex="1" parent="1">
+  <mxGeometry x="100" y="100" width="300" height="200" as="geometry"/>
 </mxCell>
 ```
 
-### Containers and Groups
+### 6.2 Swimlane Container
 
-For architecture diagrams, use proper parent-child containment:
+Visible title bar, ideal for service boundaries:
 
 ```xml
-<!-- Swimlane container with title -->
-<mxCell id="svc1" value="Service"
-  style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;"
+<mxCell id="svc1" value="User Service"
+  style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Noto Sans JP;fontSize=16;"
   vertex="1" parent="1">
   <mxGeometry x="100" y="100" width="300" height="200" as="geometry"/>
 </mxCell>
+```
 
-<!-- Child uses RELATIVE coordinates -->
-<mxCell id="api1" value="API"
-  style="rounded=1;whiteSpace=wrap;"
-  vertex="1" parent="svc1">
+Swimlanes SHOULD specify `startSize` for the title bar height.
+
+### 6.3 Custom Container
+
+Any shape acting as a container:
+
+```xml
+style="rounded=1;container=1;pointerEvents=0;"
+```
+
+Containers (except swimlanes) SHOULD include `pointerEvents=0;` to prevent connection capture.
+
+### 6.4 Children Coordinates
+
+Children MUST use **relative coordinates** within their parent container:
+
+```xml
+<!-- Child at (20, 40) relative to container origin -->
+<mxCell id="child" vertex="1" parent="svc1">
   <mxGeometry x="20" y="40" width="120" height="60" as="geometry"/>
 </mxCell>
 ```
 
-- Always add `pointerEvents=0;` to containers that should not capture connections
-- Use `swimlane` when the container needs a visible title bar
-- Use `group` for invisible grouping
+Children SHOULD not extend beyond parent container bounds.
 
-### Japanese Text Width
+### 6.5 Collapsible
 
-Allocate sufficient width to prevent unwanted line breaks:
+Consider adding `collapsible=1` for interactive containers (INFO).
+
+## 7. Layers (SUPPORTED)
+
+Layers are additional cells with `parent="0"` (like cell `id="1"`):
 
 ```xml
-<!-- 8 Japanese characters x 35px = 280px minimum -->
-<mxCell id="title" value="シンプルなフロー図">
-  <mxGeometry width="300" height="40" />
-</mxCell>
+<mxCell id="0"/>
+<mxCell id="1" parent="0"/>                    <!-- Default layer -->
+<mxCell id="layer-bg" value="Background" parent="0"/>  <!-- Custom layer -->
+<mxCell id="layer-fg" value="Foreground" parent="0"/>  <!-- Custom layer -->
 ```
 
-### XML Well-Formedness (CRITICAL)
+Assign elements to layers via `parent="layerId"`. Layer cells do not require `fontFamily`.
 
-- **NEVER use `--` inside XML comments** (causes parse errors)
-- Escape special characters: `&amp;`, `&lt;`, `&gt;`, `&quot;`
-- All `id` attributes must be unique
+## 8. Export Modes (INFORMATIONAL)
 
-## Instruction Template
+### 8.1 Transparent Background
 
-When asked to create a draw.io diagram:
+Set `page="0"` on `mxGraphModel` for transparent background in PNG export.
 
-1. Understand the diagram requirements
-2. Choose approach (XML for precision, Mermaid for simplicity)
-3. Plan the layout (positions, connections, containers)
-4. Generate XML with all rules applied
-5. Suggest PNG verification command
+### 8.2 PNG Verification
 
-## PNG Verification
-
-Always recommend PNG export for visual verification:
+Always verify diagrams with PNG export:
 
 ```bash
-# macOS
 drawio -x -f png -s 2 -t -o output.png input.drawio
-open output.png
-
-# Linux
-drawio -x -f png -s 2 -t -o output.png input.drawio
-xdg-open output.png
 ```
 
-## MCP Integration (Optional)
+### 8.3 Embed Diagram
 
-For inline previews or Mermaid.js support, use the official draw.io MCP server:
+For portable files, consider `type="embed"` on `mxfile`.
 
-- **MCP App Server**: `https://mcp.draw.io/mcp` (hosted, no install required)
-- **MCP Tool Server**: `npx @drawio/mcp` (stdio-based, opens browser)
+## 9. Japanese Text (SHOULD)
+
+- Allocate **30-40px width** per Japanese character
+- Use `Noto Sans JP` as default font for cross-platform compatibility
+- Set `defaultFontFamily="Noto Sans JP"` on `mxGraphModel`
+
+## 10. Validation
+
+### CLI Usage
+
+```bash
+# Validate a file (text output, warning+ severity)
+draw-mcp-validate diagram.drawio
+
+# JSON output
+draw-mcp-validate diagram.drawio --format json
+
+# Errors only
+draw-mcp-validate diagram.drawio --severity error
+
+# Multiple files
+draw-mcp-validate *.drawio
+```
+
+### Rule Summary (23 rules)
+
+| Module | Rules | Severity |
+|--------|-------|----------|
+| structure | root-cells, hierarchy, vertex-edge-exclusivity, parent-reference, unique-ids | ERROR |
+| style | trailing-semicolon (W), boolean-values (E), typo (W), font-family (E) | Mixed |
+| edge | z-order (W), relative (E), arrowhead-segment (W), node-spacing (W) | Mixed |
+| container | pointer-events (W), children-bounds (W), swimlane-start-size (W), collapsible (I) | Mixed |
+| text | japanese-width (W), html-escape (W), font-size (E/W) | Mixed |
+| export | page-setting (W), embed-diagram (I) | Mixed |
+
+### Quick Decision Guide
+
+| Need | Approach |
+|------|----------|
+| Custom styling, precise positioning, Japanese text | **XML** (this skill) |
+| Simple flowchart, sequence, ER diagram | **Mermaid.js** via MCP |
+| Inline preview in chat | **MCP App Server** (`mcp.draw.io/mcp`) |
 
 ## Supporting Files
 
-- [reference.md](reference.md) - Complete XML structure reference with edge routing and containers
-- [examples.md](examples.md) - Production-ready diagram examples
-- [checklist.md](checklist.md) - Pre-commit validation checklist
+- [reference.md](reference.md) — Complete XML structure reference
+- [examples.md](examples.md) — 8 production-ready examples
+- [checklist.md](checklist.md) — Pre-commit validation checklist

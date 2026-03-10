@@ -49,13 +49,20 @@ Use this checklist to validate draw.io diagrams before committing.
 - [ ] `page="0"` is set in `mxGraphModel` (for transparent background)
 - [ ] Appropriate canvas size (`dx`, `dy`)
 
-### 8. Element IDs
+### 8. Layers
+
+- [ ] Layer cells have `parent="0"`
+- [ ] Layer cells are siblings of `id="1"`
+- [ ] Elements assigned to correct layers via `parent`
+- [ ] Default layer `id="1"` is always present
+
+### 9. Element IDs
 
 - [ ] All `mxCell` elements have unique `id` attributes
 - [ ] IDs are descriptive (e.g., `box1`, `arrow1`, `label-process`)
 - [ ] Root cells `id="0"` and `id="1"` are present
 
-### 9. Visual Verification
+### 10. Visual Verification
 
 - [ ] PNG export generated successfully
 - [ ] All text is readable at intended display size
@@ -65,18 +72,25 @@ Use this checklist to validate draw.io diagrams before committing.
 - [ ] Layout is balanced and professional
 - [ ] Container boundaries properly enclose child elements
 
-## Automated Validation Script
+## Automated Validation
 
-Run the Python validator:
+### CLI Validator (23 rules)
 
 ```bash
-python tests/test_drawio_skill.py
+# Validate a file
+draw-mcp-validate diagram.drawio
+
+# JSON output
+draw-mcp-validate diagram.drawio --format json
+
+# Errors only
+draw-mcp-validate diagram.drawio --severity error
 ```
 
-Or use pytest:
+### Run Tests
 
 ```bash
-pytest tests/test_drawio_skill.py -v
+pytest tests/ -v --cov=drawio_validator
 ```
 
 ## PNG Export Verification
