@@ -6,7 +6,11 @@ from typing import List, Tuple
 
 import drawio_validator.rules.container  # noqa: F401
 import drawio_validator.rules.edge  # noqa: F401
+import drawio_validator.rules.endpoint  # noqa: F401
+import drawio_validator.rules.escape  # noqa: F401
 import drawio_validator.rules.export  # noqa: F401
+import drawio_validator.rules.group  # noqa: F401
+import drawio_validator.rules.layer  # noqa: F401
 
 # Import all rule modules to trigger registration
 import drawio_validator.rules.structure  # noqa: F401
