@@ -1,10 +1,15 @@
 """Tests for validation modes: loose, standard, strict, production."""
 
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
-from drawio_validator.rules import Mode, get_rules_for_mode
+import yaml
+
+from drawio_validator.rules import Mode, get_rule_metadata, get_rules_for_mode
 from drawio_validator.severity import Severity
 from drawio_validator.validator import validate
+
+CLAIMS_PATH = Path(__file__).parent.parent / "claims.yaml"
 
 
 VALID_MINIMAL = """<?xml version="1.0" encoding="UTF-8"?>
@@ -86,3 +91,42 @@ class TestValidateWithMode:
         standard_errors = [f for f in standard if f.severity == Severity.ERROR]
         # loose should have fewer errors (no fontFamily check)
         assert len(loose_errors) < len(standard_errors)
+
+
+class TestModeRuleMatrix:
+    """Verify the mode-rule matrix is explicit and queryable."""
+
+    def test_get_rule_metadata_returns_all(self) -> None:
+        metadata = get_rule_metadata()
+        assert len(metadata) == len(get_rules_for_mode(Mode.PRODUCTION))
+
+    def test_metadata_has_required_fields(self) -> None:
+        metadata = get_rule_metadata()
+        for entry in metadata:
+            assert "func_name" in entry
+            assert "min_mode" in entry
+
+    def test_metadata_matches_claims_yaml(self) -> None:
+        """Every entry in get_rule_metadata must match claims.yaml."""
+        with open(CLAIMS_PATH, encoding="utf-8") as f:
+            claims = yaml.safe_load(f)
+        claims_by_func = {r["func"]: r for r in claims["rules"]}
+        metadata = get_rule_metadata()
+        for entry in metadata:
+            func_name = entry["func_name"]
+            assert (
+                func_name in claims_by_func
+            ), f"Rule '{func_name}' in registry but not in claims.yaml"
+            assert entry["min_mode"] == claims_by_func[func_name]["min_mode"], (
+                f"Rule '{func_name}' mode mismatch: "
+                f"registry={entry['min_mode']}, claims={claims_by_func[func_name]['min_mode']}"
+            )
+
+    def test_no_rule_registered_without_explicit_mode_assignment(self) -> None:
+        """All rules must have a mode explicitly documented in claims.yaml."""
+        with open(CLAIMS_PATH, encoding="utf-8") as f:
+            claims = yaml.safe_load(f)
+        claimed_funcs = {r["func"] for r in claims["rules"]}
+        metadata = get_rule_metadata()
+        for entry in metadata:
+            assert entry["func_name"] in claimed_funcs

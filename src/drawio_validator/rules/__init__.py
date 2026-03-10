@@ -67,3 +67,13 @@ def get_rules_for_mode(mode: Mode) -> List[RuleFunc]:
     """
     target_level = _MODE_ORDER[mode]
     return [func for func, min_mode in _RULES if _MODE_ORDER[min_mode] <= target_level]
+
+
+def get_rule_metadata() -> List[dict]:
+    """Return metadata for all registered rules.
+
+    Each entry contains:
+    - func_name: the function name
+    - min_mode: the minimum mode level as a string
+    """
+    return [{"func_name": func.__name__, "min_mode": min_mode.value} for func, min_mode in _RULES]
