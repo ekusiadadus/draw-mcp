@@ -1,0 +1,14 @@
+name: architecture
+default_font_family: "Noto Sans JP"
+default_font_size: 18
+min_node_spacing: 80
+
+default_vertex_style: "rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;"
+default_edge_style: "edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+
+allowed_shapes:
+  - rounded
+  - rectangle
+  - cylinder3
+  - cloud
+  - hexagon

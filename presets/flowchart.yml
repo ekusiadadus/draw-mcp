@@ -1,0 +1,13 @@
+name: flowchart
+default_font_family: "Noto Sans JP"
+default_font_size: 18
+min_node_spacing: 60
+
+default_vertex_style: "rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;"
+default_edge_style: "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;strokeWidth=2;fontFamily=Noto Sans JP;"
+
+allowed_shapes:
+  - ellipse
+  - rounded
+  - rhombus
+  - rectangle
