@@ -77,14 +77,38 @@ how compliance is verified.
 - Mermaid or CSV conversion (out of scope)
 - Browser preview (out of scope)
 
+## Source of Truth
+
+`claims.yaml` is the machine-readable source of truth for all feature claims.
+Tests enforce bidirectional consistency:
+
+- Every entry in `claims.yaml` must have a matching registered rule
+- Every registered rule must appear in `claims.yaml`
+- Mode assignments must match between `claims.yaml` and the rule registry
+- Rule counts per mode are explicit and verified
+
+README and docs are derived summaries. `claims.yaml` is canonical.
+
 ## Validation Mode Contract
+
+Defined in `claims.yaml` under `mode_hierarchy.rule_counts`:
 
 | Mode | Purpose | Rule Count |
 |------|---------|-----------|
 | LOOSE | Structural parseability | 5 |
 | STANDARD | Development default | 22 |
-| STRICT | PR/CI review | 33 |
-| PRODUCTION | Team artifacts | 33 |
+| STRICT | PR/CI review | 31 |
+| PRODUCTION | Team artifacts | 31 |
+
+The mode-rule matrix is queryable via `get_rule_metadata()`.
+
+## Preset Contract
+
+Presets are **validation profiles**, not generation inputs.
+
+`validate_against_preset()` checks: font family, font size, allowed shapes.
+CLI: `draw-mcp-validate --preset presets/flowchart.yml`.
+See `docs/spec/presets.md` for full specification.
 
 ## Rule Severity Contract
 
@@ -99,9 +123,9 @@ how compliance is verified.
 1. Write test first (RED)
 2. Implement rule function with `@register(mode=Mode.X)`
 3. Pass test (GREEN)
-4. Add to claims coverage in `test_claims.py`
-5. Update spec doc in `docs/spec/`
-6. Update README rule count
+4. Add entry to `claims.yaml` (source of truth)
+5. Run `pytest tests/test_claims.py` to verify bidirectional consistency
+6. Update spec doc in `docs/spec/`
 
 ## Version Policy
 

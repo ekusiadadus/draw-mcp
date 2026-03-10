@@ -1,6 +1,6 @@
 # draw-mcp — AI-Generated draw.io XML Quality Standard
 
-A Claude Code skill and CLI validator for generating high-quality draw.io diagrams. 33 validation rules across 10 modules, 4 validation modes, preset system, and CI-ready tooling.
+A Claude Code skill and CLI validator for generating high-quality draw.io diagrams. 31 validation rules across 10 modules, 4 validation modes, preset system, and CI-ready tooling.
 
 ## Positioning
 
@@ -9,7 +9,7 @@ A Claude Code skill and CLI validator for generating high-quality draw.io diagra
 | Output | Native XML | Image/JSON | Text DSL |
 | Layout control | Pixel-perfect | Auto-layout | Auto-layout |
 | Japanese text | Full support | Limited | No control |
-| Validation | 33 rules, 4 modes | None | Syntax only |
+| Validation | 31 rules, 4 modes | None | Syntax only |
 | Presets | YAML-based | None | None |
 | Offline | Yes | Optional | Yes |
 | Best for | Production diagrams | Quick previews | Simple flows |
@@ -20,10 +20,10 @@ A Claude Code skill and CLI validator for generating high-quality draw.io diagra
 
 Features backed by validator rules, tests, and real examples:
 
-- **33 Validation Rules** across 10 modules
+- **31 Validation Rules** across 10 modules (defined in `claims.yaml`)
 - **4 Validation Modes**: loose, standard, strict, production
 - **CLI Tool**: `draw-mcp-validate` with text/JSON output, severity filtering, and mode selection
-- **Preset System**: YAML-based presets for flowchart and architecture diagrams
+- **Preset System**: YAML-based presets as validation profiles (`--preset`)
 - **Font Management**: Enforces `fontFamily` on all text elements
 - **Edge Routing**: Z-order, relative geometry, arrowhead spacing, node spacing
 - **Containers**: Swimlane, group, custom containers with pointer events
@@ -39,7 +39,7 @@ Features documented but not deeply validated:
 
 - Advanced routing heuristics (crossing density, edit tolerance)
 - Custom connection-point presets
-- Production mode preset compliance enforcement
+- PRODUCTION mode auto-detection of preset from example metadata
 
 ## Non-Goals
 
@@ -99,14 +99,16 @@ Create a layered diagram with infrastructure and application layers
 
 ## Validation Modes
 
-| Mode | Purpose | Rules |
-|------|---------|-------|
-| `loose` | Minimal parseability check | 5 structure rules |
-| `standard` | Default development mode | + 17 style/edge/container/text/export |
-| `strict` | PR and CI review | + 10 endpoint/escape/group/layer |
-| `production` | Team-shared artifacts | All 33 rules |
+| Mode | Purpose | Rule Count |
+|------|---------|-----------|
+| `loose` | Minimal parseability check | 5 |
+| `standard` | Default development mode | 22 |
+| `strict` | PR and CI review | 31 |
+| `production` | Team-shared artifacts + preset compliance | 31 |
 
-## Validation Rules (33)
+Rule counts are defined in `claims.yaml` and verified by CI.
+
+## Validation Rules (31)
 
 | Module | Rules | Mode | Default Severity |
 |--------|-------|------|-----------------|
@@ -248,14 +250,16 @@ MIT License - see [LICENSE](LICENSE)
 
 ### v2.1.0 (2026-03-10)
 
-- **33 rules**: Added endpoint, escape, group, layer modules (up from 23)
+- **31 rules**: Added endpoint, escape, group, layer modules (up from 23)
 - **4 validation modes**: loose, standard, strict, production
-- **Preset system**: YAML-based presets for flowchart and architecture
+- **claims.yaml**: Machine-readable source of truth for all feature claims
+- **Mode-rule matrix**: Explicit rule counts per mode, verified by CI
+- **Preset as validation profile**: `validate_against_preset()` + `--preset` CLI flag
 - **Golden examples**: 5 real .drawio files with validation tests
-- **Spec docs**: Formal specifications in docs/spec/
-- **Claims coverage**: Tests verify README claims match implementation
+- **Spec docs**: Formal specifications in docs/spec/ (incl. presets.md)
+- **Bidirectional claims tests**: Registry ↔ claims.yaml consistency
 - **CI fail-closed**: Removed `|| true` from validation steps
-- **153+ tests** (up from 93)
+- **162+ tests** (up from 93)
 
 ### v2.0.0 (2026-03-10)
 
