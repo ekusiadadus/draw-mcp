@@ -1,0 +1,242 @@
+# claims.yaml — Machine-readable manifest for draw-mcp.
+# This file is the SINGLE SOURCE OF TRUTH for feature claims.
+# README and docs are derived from this. CI tests verify consistency.
+
+rules:
+  # LOOSE mode (5 rules) — structural parseability
+  - func: check_root_cells
+    module: structure
+    rule_ids: ["structure/root-cells"]
+    min_mode: loose
+    severities: [error]
+    description: "Verify root cells id=0 and id=1 exist"
+
+  - func: check_hierarchy
+    module: structure
+    rule_ids: ["structure/hierarchy"]
+    min_mode: loose
+    severities: [error]
+    description: "Verify mxfile > diagram > mxGraphModel > root hierarchy"
+
+  - func: check_vertex_edge_exclusivity
+    module: structure
+    rule_ids: ["structure/vertex-edge-exclusivity"]
+    min_mode: loose
+    severities: [error]
+    description: "Verify no cell has both vertex=1 and edge=1"
+
+  - func: check_parent_references
+    module: structure
+    rule_ids: ["structure/parent-reference"]
+    min_mode: loose
+    severities: [error]
+    description: "Verify all parent references point to existing cells"
+
+  - func: check_unique_ids
+    module: structure
+    rule_ids: ["structure/unique-ids"]
+    min_mode: loose
+    severities: [error]
+    description: "Verify all mxCell elements have unique IDs"
+
+  # STANDARD mode (17 rules) — development default
+  - func: check_trailing_semicolon
+    module: style
+    rule_ids: ["style/trailing-semicolon"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify style strings end with semicolon"
+
+  - func: check_boolean_values
+    module: style
+    rule_ids: ["style/boolean-values"]
+    min_mode: standard
+    severities: [error]
+    description: "Verify boolean style values use 0/1 not true/false"
+
+  - func: check_style_typos
+    module: style
+    rule_ids: ["style/typo"]
+    min_mode: standard
+    severities: [warning]
+    description: "Detect common style key typos"
+
+  - func: check_font_family
+    module: style
+    rule_ids: ["style/font-family"]
+    min_mode: standard
+    severities: [error]
+    description: "Verify all text elements have fontFamily specified"
+
+  - func: check_z_order
+    module: edge
+    rule_ids: ["edge/z-order"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify edges are declared before vertices for Z-order"
+
+  - func: check_edge_relative
+    module: edge
+    rule_ids: ["edge/relative"]
+    min_mode: standard
+    severities: [error]
+    description: "Verify edge geometries have relative=1"
+
+  - func: check_arrowhead_segment
+    module: edge
+    rule_ids: ["edge/arrowhead-segment"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify edges have sufficient final segment length"
+
+  - func: check_node_spacing
+    module: edge
+    rule_ids: ["edge/node-spacing"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify nodes have sufficient spacing"
+
+  - func: check_pointer_events
+    module: container
+    rule_ids: ["container/pointer-events"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify containers have pointerEvents=0"
+
+  - func: check_children_bounds
+    module: container
+    rule_ids: ["container/children-bounds"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify children are within parent container bounds"
+
+  - func: check_swimlane_start_size
+    module: container
+    rule_ids: ["container/swimlane-start-size"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify swimlane containers have startSize defined"
+
+  - func: check_collapsible
+    module: container
+    rule_ids: ["container/collapsible"]
+    min_mode: standard
+    severities: [info]
+    description: "Suggest collapsible=1 for containers"
+
+  - func: check_japanese_width
+    module: text
+    rule_ids: ["text/japanese-width"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify text width is sufficient for Japanese characters"
+
+  - func: check_html_escape
+    module: text
+    rule_ids: ["text/html-escape"]
+    min_mode: standard
+    severities: [warning]
+    description: "Check for unsafe HTML in values when html=1"
+
+  - func: check_font_size
+    module: text
+    rule_ids: ["text/font-size"]
+    min_mode: standard
+    severities: [error, warning]
+    description: "Verify font sizes are adequate for readability"
+
+  - func: check_page_setting
+    module: export
+    rule_ids: ["export/page-setting"]
+    min_mode: standard
+    severities: [warning]
+    description: "Verify page=0 for transparent background"
+
+  - func: check_embed_diagram
+    module: export
+    rule_ids: ["export/embed-diagram"]
+    min_mode: standard
+    severities: [info]
+    description: "Recommend embedding diagram data in exports"
+
+  # STRICT mode (9 additional rules) — PR/CI review
+  - func: check_endpoint_validity
+    module: endpoint
+    rule_ids: ["endpoint/source-validity", "endpoint/target-validity"]
+    min_mode: strict
+    severities: [error]
+    description: "Verify edge source and target reference existing cells"
+
+  - func: check_floating_edges
+    module: endpoint
+    rule_ids: ["endpoint/floating-edge"]
+    min_mode: strict
+    severities: [warning]
+    description: "Detect edges with neither source nor target"
+
+  - func: check_orphan_edges
+    module: endpoint
+    rule_ids: ["endpoint/orphan-edge"]
+    min_mode: strict
+    severities: [warning]
+    description: "Detect edges with only one endpoint"
+
+  - func: check_value_escaping
+    module: escape
+    rule_ids: ["escape/control-chars"]
+    min_mode: strict
+    severities: [warning]
+    description: "Verify values have no raw control characters"
+
+  - func: check_dangerous_tags
+    module: escape
+    rule_ids: ["escape/dangerous-tags"]
+    min_mode: strict
+    severities: [error]
+    description: "Detect dangerous HTML tags in html=1 values"
+
+  - func: check_group_detection
+    module: group
+    rule_ids: ["group/missing-container"]
+    min_mode: strict
+    severities: [warning]
+    description: "Verify group cells have container=1"
+
+  - func: check_group_connectability
+    module: group
+    rule_ids: ["group/connectability"]
+    min_mode: strict
+    severities: [warning]
+    description: "Warn when edges connect directly to group cells"
+
+  - func: check_layer_structure
+    module: layer
+    rule_ids: ["layer/structure"]
+    min_mode: strict
+    severities: [warning]
+    description: "Verify layer cells have proper structure"
+
+  - func: check_cross_layer_edges
+    module: layer
+    rule_ids: ["layer/cross-layer-edge"]
+    min_mode: strict
+    severities: [warning]
+    description: "Detect edges connecting vertices across layers"
+
+# Mode hierarchy with explicit rule counts
+mode_hierarchy:
+  order: [loose, standard, strict, production]
+  rule_counts:
+    loose: 5
+    standard: 22
+    strict: 31
+    production: 31
+
+# Golden example requirements
+golden_examples:
+  min_count: 4
+  required_files:
+    - flowchart-basic.drawio
+    - architecture-layered.drawio
+    - swimlane-process.drawio
+    - japanese-labels.drawio
