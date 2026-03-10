@@ -271,3 +271,166 @@ Use HTML entities for special characters:
 | `"` | `&quot;` |
 | `'` | `&apos;` |
 | newline | `&#xa;` or `<br>` (with html=1) |
+
+## XML Well-Formedness (CRITICAL)
+
+Generated XML **must** be well-formed:
+
+- **NEVER use `--` inside XML comments.** `--` is illegal inside `<!-- -->` per the XML spec and causes parse errors. Use single hyphens or rephrase.
+- Escape special characters in attribute values (`&amp;`, `&lt;`, `&gt;`, `&quot;`).
+- All `mxCell` elements must have unique `id` attributes.
+- Root cells `id="0"` and `id="1"` are always required.
+
+```xml
+<!-- WRONG: Double hyphens in comment -->
+<!-- Order 1 --- OrderItem -->
+
+<!-- CORRECT: Use words instead -->
+<!-- Order 1 to OrderItem -->
+```
+
+## Edge Routing Best Practices
+
+draw.io does **not** have built-in collision detection for edges. Plan layout and routing carefully.
+
+### Node Spacing
+
+- Space nodes at least **60px** apart
+- Prefer **200px horizontal** / **120px vertical** gaps
+- Align nodes to a grid (multiples of 10)
+
+### Connection Points (exitX/exitY, entryX/entryY)
+
+Use `exitX`/`exitY` and `entryX`/`entryY` (values 0-1) to control which side of a node an edge connects to. Spread connections across different sides to prevent overlap.
+
+```xml
+<!-- Connect from right side of source to left side of target -->
+<mxCell id="e1"
+  style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+  edge="1" parent="1" source="box1" target="box2">
+  <mxGeometry relative="1" as="geometry" />
+</mxCell>
+```
+
+### Arrowhead Spacing
+
+The final straight segment of an edge must be long enough to fit the arrowhead (default size: 6px, configurable via `startSize`/`endSize`). Ensure at least **20px** of straight segment before the target and after the source.
+
+### Explicit Waypoints
+
+Add waypoints when edges would overlap:
+
+```xml
+<mxCell id="e1"
+  style="edgeStyle=orthogonalEdgeStyle;rounded=1;"
+  edge="1" parent="1" source="a" target="b">
+  <mxGeometry relative="1" as="geometry">
+    <Array as="points">
+      <mxPoint x="300" y="150"/>
+      <mxPoint x="300" y="250"/>
+    </Array>
+  </mxGeometry>
+</mxCell>
+```
+
+### Edge Style Tips
+
+- Use `rounded=1` on edges for cleaner bends
+- Use `jettySize=auto` for better port spacing on orthogonal edges
+- Use `edgeStyle=orthogonalEdgeStyle` for right-angle connectors (most common)
+
+## Containers and Groups
+
+For architecture diagrams or nested elements, use proper parent-child containment.
+
+### How Containment Works
+
+Set `parent="containerId"` on child cells. Children use **relative coordinates** within the container.
+
+### Container Types
+
+| Type | Style | When to Use |
+|------|-------|-------------|
+| **Group** (invisible) | `group;` | No visual border needed, container has no connections |
+| **Swimlane** (titled) | `swimlane;startSize=30;` | Visible title bar/header, or container itself has connections |
+| **Custom container** | `container=1;pointerEvents=0;` | Any shape acting as a container without its own connections |
+
+### Key Rules
+
+- **Always add `pointerEvents=0;`** to container styles that should not capture connections being rewired between children
+- Only omit `pointerEvents=0` when the container itself needs to be connectable (use `swimlane` style)
+- Children must set `parent="containerId"` and use coordinates **relative to the container**
+
+### Swimlane Container Example
+
+```xml
+<!-- Swimlane container with title -->
+<mxCell id="svc1" value="User Service"
+  style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Noto Sans JP;fontSize=16;"
+  vertex="1" parent="1">
+  <mxGeometry x="100" y="100" width="300" height="200" as="geometry"/>
+</mxCell>
+
+<!-- Child inside container (relative coordinates) -->
+<mxCell id="api1" value="REST API"
+  style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=14;"
+  vertex="1" parent="svc1">
+  <mxGeometry x="20" y="40" width="120" height="60" as="geometry"/>
+</mxCell>
+
+<mxCell id="db1" value="Database"
+  style="shape=cylinder3;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=14;"
+  vertex="1" parent="svc1">
+  <mxGeometry x="160" y="40" width="120" height="60" as="geometry"/>
+</mxCell>
+```
+
+### Invisible Group Container Example
+
+```xml
+<!-- Invisible group container -->
+<mxCell id="grp1" value=""
+  style="group;"
+  vertex="1" parent="1">
+  <mxGeometry x="100" y="100" width="300" height="200" as="geometry"/>
+</mxCell>
+
+<mxCell id="c1" value="Component A"
+  style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=14;"
+  vertex="1" parent="grp1">
+  <mxGeometry x="10" y="10" width="120" height="60" as="geometry"/>
+</mxCell>
+```
+
+## Mermaid.js Integration
+
+For simple diagrams, Mermaid.js syntax can be converted to draw.io format via the official MCP server or draw.io editor.
+
+### Quick Decision Guide
+
+| Need | Format | Reliability |
+|------|--------|-------------|
+| Flowchart, sequence, ER diagram | Mermaid.js | High |
+| Custom styling, precise positioning | XML | High |
+| Org chart from data | CSV | Medium |
+
+**Default to Mermaid** for simple diagrams. Use XML when you need precise control over positioning, fonts, or Japanese text.
+
+## Official References
+
+- [draw.io Style Reference](https://www.drawio.com/doc/faq/drawio-style-reference.html) - Complete style properties
+- [draw.io XSD Schema](https://www.drawio.com/assets/mxfile.xsd) - XML Schema Definition for validation
+- [draw.io XML Format](https://www.drawio.com/doc/faq/diagram-source-edit) - Official XML documentation
+
+## Troubleshooting
+
+| Error | Cause | Solution |
+|-------|-------|---------|
+| Double hyphen parse error | `--` used inside XML comments | Remove double hyphens from comments |
+| Font not rendering in PNG | `fontFamily` missing from elements | Add `fontFamily=FontName;` to every text style |
+| Arrow in front of boxes | Edge declared after vertex elements | Move all edges before vertices in XML |
+| Label overlaps with arrow | Label too close to arrow line | Adjust label Y to be 20px+ away from arrow |
+| Japanese text wraps | Geometry width too narrow | Increase width (30-40px per character) |
+| Background not transparent | `page` not set to `"0"` | Add `page="0"` to mxGraphModel |
+| Arrowhead overlaps bend | Final segment too short | Ensure 20px+ straight segment before target |
+| Connections captured by container | Missing `pointerEvents=0` | Add `pointerEvents=0;` to container style |

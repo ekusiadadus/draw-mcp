@@ -1,14 +1,18 @@
 # Claude Skill: draw.io Diagram Generator
 
-A Claude Code skill for generating high-quality draw.io diagrams with proper font settings, arrow placement, and Japanese text support.
+A Claude Code skill for generating high-quality draw.io diagrams with proper font settings, arrow placement, edge routing, containers, and Japanese text support.
 
 ## Features
 
 - **Font Management**: Ensures `fontFamily` is set on all text elements
 - **Arrow Layering**: Correct Z-order placement (arrows behind boxes)
+- **Edge Routing**: Node spacing, waypoints, connection point control, arrowhead spacing
+- **Containers/Groups**: Swimlane, group, and custom container support with proper parent-child containment
 - **Japanese Text Support**: Proper width allocation for CJK characters
+- **XML Well-Formedness**: Validates `--` in comments, unique IDs, escape characters
 - **PNG Validation**: Pre-commit hooks for automatic PNG generation
-- **Best Practices**: Comprehensive checklist and examples
+- **MCP Integration**: Compatible with official [draw.io MCP server](https://github.com/jgraph/drawio-mcp)
+- **Best Practices**: Comprehensive checklist, 7 production-ready examples
 
 ## Installation
 
@@ -45,6 +49,8 @@ Create a simple flowchart showing: Start -> Process -> End
 
 Draw an architecture diagram with Web Server, API, and Database
 
+Create a microservices diagram with swimlane containers
+
 Create a sequence diagram for user login flow
 ```
 
@@ -55,6 +61,24 @@ If needed, you can explicitly request the skill:
 ```
 Using the draw-io skill, create a flowchart for the authentication process
 ```
+
+## MCP Integration (Optional)
+
+For inline previews or Mermaid.js support, use the official draw.io MCP server:
+
+| Method | Best For | Setup |
+|--------|----------|-------|
+| **MCP App Server** | Inline previews in chat | Add `https://mcp.draw.io/mcp` as remote MCP server |
+| **MCP Tool Server** | Desktop workflows | `npx @drawio/mcp` |
+| **This Skill** | Code-based workflows with full control | See Installation above |
+
+### Quick Decision Guide
+
+| Need | Approach |
+|------|----------|
+| Custom styling, precise positioning, Japanese text | XML (this skill) |
+| Flowchart, sequence, ER diagram | Mermaid.js via MCP |
+| Inline preview in chat | MCP App Server |
 
 ## Requirements
 
@@ -84,13 +108,15 @@ draw-mcp/
 ├── skills/
 │   └── draw-io/
 │       ├── SKILL.md         # Main skill definition
-│       ├── reference.md     # XML structure reference
-│       ├── examples.md      # Production-ready examples
-│       └── checklist.md     # Validation checklist
+│       ├── reference.md     # XML reference (edge routing, containers, etc.)
+│       ├── examples.md      # 7 production-ready examples
+│       └── checklist.md     # Validation checklist (9 categories)
 ├── scripts/
 │   └── convert-drawio-to-png.sh
 ├── tests/
-│   └── test_drawio_skill.py
+│   └── test_drawio_skill.py # 20 test cases
+├── examples/
+│   └── sample-flowchart.drawio
 ├── docs/
 │   └── RULE.md
 ├── .pre-commit-config.yaml
@@ -104,39 +130,42 @@ draw-mcp/
 ### 1. Font Settings
 
 ```xml
-<!-- In mxGraphModel -->
 <mxGraphModel defaultFontFamily="Noto Sans JP" ...>
-
-<!-- In EVERY text element -->
 <mxCell style="...fontFamily=Noto Sans JP;fontSize=18;..." />
 ```
 
-### 2. Arrow Placement
+### 2. Arrow Placement (Z-Order)
 
-Arrows must be declared FIRST in XML to render behind other elements:
+Arrows must be declared FIRST in XML to render behind other elements.
 
-```xml
-<root>
-  <!-- Arrows first (background) -->
-  <mxCell id="arrow1" edge="1" ... />
+### 3. Edge Routing
 
-  <!-- Boxes after (foreground) -->
-  <mxCell id="box1" vertex="1" ... />
-</root>
-```
+- Space nodes at least 60px apart (prefer 200px horizontal / 120px vertical)
+- Use `exitX`/`exitY` and `entryX`/`entryY` to control connection sides
+- Ensure 20px+ straight segment before target for arrowheads
+- Add explicit waypoints where edges would overlap
 
-### 3. Japanese Text Width
-
-Allocate 30-40px per Japanese character:
+### 4. Containers
 
 ```xml
-<!-- 6 characters × 35px = 210px -->
-<mxGeometry width="220" ... />
+<!-- Swimlane (titled container) -->
+<mxCell style="swimlane;startSize=30;" vertex="1" parent="1">
+
+<!-- Children use RELATIVE coordinates -->
+<mxCell style="rounded=1;" vertex="1" parent="svc1">
 ```
 
-### 4. PNG Verification
+### 5. Japanese Text Width
 
-Always export to PNG and verify visually:
+Allocate 30-40px per Japanese character.
+
+### 6. XML Well-Formedness
+
+- Never use `--` inside XML comments
+- Escape special characters
+- All IDs must be unique
+
+### 7. PNG Verification
 
 ```bash
 drawio -x -f png -s 2 -t -o diagram.png diagram.drawio
@@ -146,9 +175,9 @@ drawio -x -f png -s 2 -t -o diagram.png diagram.drawio
 
 This project includes pre-commit hooks for:
 
-1. **XML Validation**: Check font settings and structure
+1. **XML Validation**: Check font settings, structure, and well-formedness
 2. **PNG Conversion**: Auto-generate PNG on commit
-3. **Python Tests**: Run skill validation tests
+3. **Python Tests**: Run 20 skill validation tests
 
 Setup:
 
@@ -182,10 +211,25 @@ MIT License - see [LICENSE](LICENSE)
 ## Related Resources
 
 - [draw.io Desktop](https://github.com/jgraph/drawio-desktop)
+- [draw.io MCP Server (Official)](https://github.com/jgraph/drawio-mcp)
+- [@drawio/mcp (npm)](https://www.npmjs.com/package/@drawio/mcp)
+- [draw.io Style Reference](https://www.drawio.com/doc/faq/drawio-style-reference.html)
+- [draw.io XSD Schema](https://www.drawio.com/assets/mxfile.xsd)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)
-- [draw.io XML Format Reference](https://www.diagrams.net/doc/faq/xml-format)
 
 ## Changelog
+
+### v1.1.0 (2026-03-10)
+
+- Edge routing best practices (node spacing, waypoints, connection points, arrowhead spacing)
+- Container/group support (swimlane, group, custom containers with pointerEvents)
+- XML well-formedness validation (double hyphens, unique IDs)
+- Mermaid.js integration guide via official MCP server
+- 2 new production-ready examples (container architecture, edge routing)
+- 8 new test cases (20 total)
+- Updated checklist with 9 validation categories
+- Official draw.io style reference and XSD schema links
+- Expanded troubleshooting table
 
 ### v1.0.0 (2025-12-16)
 
