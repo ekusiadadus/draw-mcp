@@ -32,32 +32,79 @@ AI must output these 10 principles verbatim at the beginning of every chat befor
 
 ---
 
-# draw.io Skill Specific Rules
+# draw-mcp Product Contract
 
-## XML Structure Rules
+## Scope
 
-1. **Font Settings**
-   - Set `defaultFontFamily` in `mxGraphModel`
-   - Add `fontFamily=FontName;` to all text element styles
-   - Recommended font size: 1.5x standard (18px)
+draw-mcp is a quality standard for AI-generated native draw.io XML.
+This contract defines what draw-mcp guarantees, what it does not, and
+how compliance is verified.
 
-2. **Arrow Placement**
-   - Arrows must be placed at the back (first in XML order)
-   - Labels must be at least 20px away from arrows
-   - Use explicit coordinates for text element connections
+## Guarantees
 
-3. **Text Element Sizing**
-   - Allocate approximately 30-40px per Japanese character
-   - Ensure sufficient width to prevent unintended line breaks
+### Validation
 
-4. **PNG Conversion**
-   - Always verify with PNG output
-   - Use pre-commit hooks for automatic conversion
-   - Scale factor: 2x for high resolution
+| Guarantee | Verification |
+|-----------|-------------|
+| 33 rules across 10 modules | `test_claims.py` |
+| 4 validation modes (loose → production) | `test_modes.py` |
+| Zero false positives on golden examples | `test_golden_examples.py` |
+| Mode hierarchy: loose < standard ≤ strict ≤ production | `test_claims.py::test_mode_hierarchy` |
+| CLI exits non-zero on ERROR findings | `test_cli.py` |
+| Backward-compatible `validate_all()` API | `test_integration.py` |
 
-## Commit Message Format
+### Quality
 
-Follow Google's commit message style:
-- Use present tense ("Add feature" not "Added feature")
-- First line: summary under 50 characters
-- Body: detailed description of what and why
+| Guarantee | Verification |
+|-----------|-------------|
+| All golden examples pass STANDARD mode | `test_golden_examples.py` |
+| 153+ tests | CI test count |
+| Coverage ≥ 80% | `pyproject.toml` coverage config |
+| CI is fail-closed (no `\|\| true`) | `.github/workflows/ci.yml` |
+
+### Documentation
+
+| Guarantee | Verification |
+|-----------|-------------|
+| README separates Supported / Experimental / Non-Goals | README.md |
+| Spec docs exist for all rule categories | `docs/spec/` |
+| Preset files are loadable and valid | `test_preset.py` |
+
+## Non-Guarantees
+
+- Export produces correct PNG/SVG (depends on draw.io CLI)
+- Auto-layout quality (depends on draw.io engine)
+- Mermaid or CSV conversion (out of scope)
+- Browser preview (out of scope)
+
+## Validation Mode Contract
+
+| Mode | Purpose | Rule Count |
+|------|---------|-----------|
+| LOOSE | Structural parseability | 5 |
+| STANDARD | Development default | 22 |
+| STRICT | PR/CI review | 33 |
+| PRODUCTION | Team artifacts | 33 |
+
+## Rule Severity Contract
+
+| Severity | Meaning | CI Impact |
+|----------|---------|-----------|
+| ERROR | Must fix before merge | CLI exits 1 |
+| WARNING | Should fix, review required | Reported only |
+| INFO | Informational suggestion | Reported only |
+
+## Adding New Rules
+
+1. Write test first (RED)
+2. Implement rule function with `@register(mode=Mode.X)`
+3. Pass test (GREEN)
+4. Add to claims coverage in `test_claims.py`
+5. Update spec doc in `docs/spec/`
+6. Update README rule count
+
+## Version Policy
+
+- MAJOR: Breaking changes to CLI or API
+- MINOR: New rules, modes, or presets
+- PATCH: Bug fixes in existing rules
