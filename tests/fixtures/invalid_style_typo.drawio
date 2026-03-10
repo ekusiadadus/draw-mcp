@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron">
+  <diagram name="Style Typo" id="typo">
+    <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="a" value="Typo Box"
+          style="rounded=1;storkeColor=#000000;fontFamily=Noto Sans JP;fontSize=18;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="120" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

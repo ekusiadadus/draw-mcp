@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron">
+  <diagram name="Swimlane" id="swimlane">
+    <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="sw1" value="Service"
+          style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Noto Sans JP;fontSize=16;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="300" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="api1" value="API"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=14;"
+          vertex="1" parent="sw1">
+          <mxGeometry x="20" y="40" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="db1" value="DB"
+          style="shape=cylinder3;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=14;"
+          vertex="1" parent="sw1">
+          <mxGeometry x="160" y="40" width="120" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

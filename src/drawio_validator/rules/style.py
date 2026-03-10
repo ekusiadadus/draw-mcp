@@ -250,6 +250,9 @@ def check_font_family(root: ET.Element) -> List[Finding]:
         value = cell.get("value", "")
         if not value:
             continue
+        # Skip root/layer cells (parent="0" without vertex/edge) - they are structural
+        if cell.get("parent") == "0" and cell.get("vertex") != "1" and cell.get("edge") != "1":
+            continue
         if "fontFamily=" not in style:
             cell_id = cell.get("id", "unknown")
             findings.append(

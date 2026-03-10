@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron">
+  <diagram name="Edge Waypoint" id="waypoint">
+    <mxGraphModel dx="1200" dy="800" page="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="e1"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;"
+          edge="1" parent="1" source="a" target="b">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="150"/>
+              <mxPoint x="300" y="250"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a" value="Start"
+          style="rounded=1;fontFamily=Noto Sans JP;fontSize=18;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b" value="End"
+          style="rounded=1;fontFamily=Noto Sans JP;fontSize=18;"
+          vertex="1" parent="1">
+          <mxGeometry x="400" y="220" width="120" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
