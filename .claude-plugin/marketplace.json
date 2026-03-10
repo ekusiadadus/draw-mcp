@@ -9,7 +9,7 @@
       "name": "draw-io",
       "source": "./",
       "description": "Generate high-quality draw.io diagrams with Claude Code. Handles font settings, arrow layering, Japanese text, and PNG export validation.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "ekusiadadus"
       }
