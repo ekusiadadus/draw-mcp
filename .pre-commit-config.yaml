@@ -34,50 +34,14 @@ repos:
   # Local hooks
   - repo: local
     hooks:
-      # Validate draw.io files
+      # Validate draw.io files using CLI validator (23 rules)
       - id: validate-drawio
         name: Validate draw.io XML
-        entry: python -c "
-import sys
-import xml.etree.ElementTree as ET
-import re
-
-errors = []
-for filepath in sys.argv[1:]:
-    try:
-        with open(filepath, 'r') as f:
-            content = f.read()
-        root = ET.fromstring(content)
-
-        # Check fontFamily in text elements
-        for cell in root.findall('.//mxCell'):
-            style = cell.get('style', '')
-            value = cell.get('value', '')
-            if value and 'fontFamily=' not in style:
-                cell_id = cell.get('id', 'unknown')
-                errors.append(f'{filepath}: Cell {cell_id} missing fontFamily')
-
-        # Check font size
-        for cell in root.findall('.//mxCell'):
-            style = cell.get('style', '')
-            match = re.search(r'fontSize=(\d+)', style)
-            if match and int(match.group(1)) < 14:
-                cell_id = cell.get('id', 'unknown')
-                errors.append(f'{filepath}: Cell {cell_id} has small font size')
-
-    except ET.ParseError as e:
-        errors.append(f'{filepath}: XML parse error - {e}')
-    except Exception as e:
-        errors.append(f'{filepath}: Error - {e}')
-
-if errors:
-    for err in errors:
-        print(err)
-    sys.exit(1)
-"
+        entry: draw-mcp-validate
         language: python
         files: \.drawio$
         pass_filenames: true
+        additional_dependencies: ["drawio-validator"]
 
       # Convert draw.io to PNG
       - id: convert-drawio-to-png
@@ -91,8 +55,8 @@ if errors:
       # Run pytest for draw.io skill tests
       - id: pytest-drawio
         name: Run draw.io skill tests
-        entry: python -m pytest tests/test_drawio_skill.py -v --tb=short
+        entry: python -m pytest tests/ -v --tb=short
         language: python
         pass_filenames: false
         always_run: true
-        additional_dependencies: [pytest]
+        additional_dependencies: [pytest, pytest-cov]
