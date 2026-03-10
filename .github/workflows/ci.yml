@@ -39,9 +39,9 @@ jobs:
         run: |
           pytest tests/ -v --cov=drawio_validator --cov-report=term-missing --cov-report=xml
 
-      - name: Validate example drawio files
+      - name: Validate example drawio files (hard gate)
         run: |
-          draw-mcp-validate examples/*.drawio --severity error || true
+          draw-mcp-validate examples/*.drawio --mode standard --severity error
 
       - name: Check XML well-formedness of fixtures
         run: |
@@ -65,5 +65,5 @@ jobs:
       - name: Shellcheck
         run: |
           if ls scripts/*.sh 1>/dev/null 2>&1; then
-            shellcheck scripts/*.sh || true
+            shellcheck scripts/*.sh
           fi
