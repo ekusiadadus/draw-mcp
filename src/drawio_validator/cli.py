@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from drawio_validator.output import format_json, format_text
+from drawio_validator.rules import Mode
 from drawio_validator.severity import Severity
 from drawio_validator.validator import validate
 
@@ -28,6 +29,12 @@ def main(argv: list[str] | None = None) -> int:
         default="warning",
         help="Minimum severity to report (default: warning)",
     )
+    parser.add_argument(
+        "--mode",
+        choices=["loose", "standard", "strict", "production"],
+        default="standard",
+        help="Validation mode (default: standard)",
+    )
 
     args = parser.parse_args(argv)
 
@@ -37,6 +44,14 @@ def main(argv: list[str] | None = None) -> int:
         "info": Severity.INFO,
     }
     min_severity = severity_map[args.severity]
+
+    mode_map = {
+        "loose": Mode.LOOSE,
+        "standard": Mode.STANDARD,
+        "strict": Mode.STRICT,
+        "production": Mode.PRODUCTION,
+    }
+    validation_mode = mode_map[args.mode]
 
     has_errors = False
     all_output: list[str] = []
@@ -48,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         xml_content = filepath.read_text(encoding="utf-8")
-        findings = validate(xml_content)
+        findings = validate(xml_content, mode=validation_mode)
 
         error_findings = [f for f in findings if f.severity == Severity.ERROR]
         if error_findings:

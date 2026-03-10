@@ -12,7 +12,7 @@ import drawio_validator.rules.export  # noqa: F401
 import drawio_validator.rules.structure  # noqa: F401
 import drawio_validator.rules.style  # noqa: F401
 import drawio_validator.rules.text  # noqa: F401
-from drawio_validator.rules import get_all_rules
+from drawio_validator.rules import Mode, get_all_rules, get_rules_for_mode
 from drawio_validator.severity import Finding, Severity
 
 
@@ -36,10 +36,11 @@ def _check_double_hyphens(xml_content: str) -> List[Finding]:
     return findings
 
 
-def validate(xml_content: str) -> List[Finding]:
-    """Run all validation rules and return list of Findings.
+def validate(xml_content: str, *, mode: Mode = Mode.STANDARD) -> List[Finding]:
+    """Run validation rules for the given mode and return list of Findings.
 
     This is the primary API for v2.0.
+    Default mode is STANDARD.
     """
     findings: List[Finding] = []
 
@@ -59,8 +60,8 @@ def validate(xml_content: str) -> List[Finding]:
         )
         return findings
 
-    # Run all registered rules
-    for rule_func in get_all_rules():
+    # Run rules for the requested mode
+    for rule_func in get_rules_for_mode(mode):
         findings.extend(rule_func(root))
 
     return findings
@@ -69,9 +70,9 @@ def validate(xml_content: str) -> List[Finding]:
 def validate_all(xml_content: str) -> Tuple[List[str], List[str]]:
     """Backward-compatible API returning (errors, warnings) as string lists.
 
-    Delegates to validate() internally.
+    Delegates to validate() internally with STANDARD mode.
     """
-    findings = validate(xml_content)
+    findings = validate(xml_content, mode=Mode.STANDARD)
     errors = [f.message for f in findings if f.severity == Severity.ERROR]
     warnings = [f.message for f in findings if f.severity == Severity.WARNING]
     return errors, warnings

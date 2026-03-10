@@ -3,11 +3,11 @@
 import xml.etree.ElementTree as ET
 from typing import List
 
-from drawio_validator.rules import register
+from drawio_validator.rules import Mode, register
 from drawio_validator.severity import Finding, Severity
 
 
-@register
+@register(mode=Mode.LOOSE)
 def check_root_cells(root: ET.Element) -> List[Finding]:
     """Verify that root cells id=0 and id=1 (parent=0) exist."""
     findings: List[Finding] = []
@@ -35,7 +35,7 @@ def check_root_cells(root: ET.Element) -> List[Finding]:
     return findings
 
 
-@register
+@register(mode=Mode.LOOSE)
 def check_hierarchy(root: ET.Element) -> List[Finding]:
     """Verify mxfile > diagram > mxGraphModel > root hierarchy."""
     findings: List[Finding] = []
@@ -85,7 +85,7 @@ def check_hierarchy(root: ET.Element) -> List[Finding]:
     return findings
 
 
-@register
+@register(mode=Mode.LOOSE)
 def check_vertex_edge_exclusivity(root: ET.Element) -> List[Finding]:
     """Verify no cell has both vertex=1 and edge=1."""
     findings: List[Finding] = []
@@ -106,7 +106,7 @@ def check_vertex_edge_exclusivity(root: ET.Element) -> List[Finding]:
     return findings
 
 
-@register
+@register(mode=Mode.LOOSE)
 def check_parent_references(root: ET.Element) -> List[Finding]:
     """Verify all parent references point to existing cells."""
     findings: List[Finding] = []
@@ -128,7 +128,7 @@ def check_parent_references(root: ET.Element) -> List[Finding]:
     return findings
 
 
-@register
+@register(mode=Mode.LOOSE)
 def check_unique_ids(root: ET.Element) -> List[Finding]:
     """Verify all mxCell elements have unique IDs."""
     findings: List[Finding] = []
