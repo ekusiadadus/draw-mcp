@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron">
+  <diagram name="Layered Architecture" id="arch-layered-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" page="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Edges first -->
+        <mxCell id="e1"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+          edge="1" parent="1" source="ui" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+          edge="1" parent="1" source="api" target="svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+          edge="1" parent="1" source="svc" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Presentation Layer -->
+        <mxCell id="ui" value="プレゼンテーション層"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;fillColor=#dae8fc;strokeColor=#6c8ebf;"
+          vertex="1" parent="1">
+          <mxGeometry x="150" y="80" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- API Layer -->
+        <mxCell id="api" value="API層"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;fillColor=#d5e8d4;strokeColor=#82b366;"
+          vertex="1" parent="1">
+          <mxGeometry x="150" y="220" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Service Layer -->
+        <mxCell id="svc" value="サービス層"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;fillColor=#fff2cc;strokeColor=#d6b656;"
+          vertex="1" parent="1">
+          <mxGeometry x="150" y="360" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Data Layer -->
+        <mxCell id="db" value="データ層"
+          style="shape=cylinder3;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;fillColor=#f8cecc;strokeColor=#b85450;size=15;"
+          vertex="1" parent="1">
+          <mxGeometry x="175" y="500" width="150" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron">
+  <diagram name="Swimlane Process" id="swim-proc-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" page="0" defaultFontFamily="Noto Sans JP">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Edges first -->
+        <mxCell id="e1"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+          edge="1" parent="1" source="req" target="review">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;fontFamily=Noto Sans JP;"
+          edge="1" parent="1" source="review" target="deploy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Development -->
+        <mxCell id="lane1" value="開発チーム"
+          style="swimlane;startSize=30;fontFamily=Noto Sans JP;fontSize=16;fillColor=#dae8fc;strokeColor=#6c8ebf;collapsible=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="80" width="300" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="req" value="要件定義"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;"
+          vertex="1" parent="lane1">
+          <mxGeometry x="90" y="60" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: QA -->
+        <mxCell id="lane2" value="QAチーム"
+          style="swimlane;startSize=30;fontFamily=Noto Sans JP;fontSize=16;fillColor=#d5e8d4;strokeColor=#82b366;collapsible=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="320" width="300" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="review" value="レビュー"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;"
+          vertex="1" parent="lane2">
+          <mxGeometry x="90" y="60" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Ops -->
+        <mxCell id="lane3" value="運用チーム"
+          style="swimlane;startSize=30;fontFamily=Noto Sans JP;fontSize=16;fillColor=#fff2cc;strokeColor=#d6b656;collapsible=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="100" y="560" width="300" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy" value="デプロイ"
+          style="rounded=1;whiteSpace=wrap;fontFamily=Noto Sans JP;fontSize=18;"
+          vertex="1" parent="lane3">
+          <mxGeometry x="90" y="60" width="140" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
