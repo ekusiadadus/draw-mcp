@@ -40,10 +40,7 @@ class TestEndpointValidity:
             </mxCell>
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_endpoint_validity(_parse(xml))
-        assert any(
-            f.severity == Severity.ERROR and "source" in f.message.lower()
-            for f in findings
-        )
+        assert any(f.severity == Severity.ERROR and "source" in f.message.lower() for f in findings)
 
     def test_invalid_target(self) -> None:
         xml = """<mxfile><diagram name="P" id="d1"><mxGraphModel><root>
@@ -55,10 +52,7 @@ class TestEndpointValidity:
             </mxCell>
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_endpoint_validity(_parse(xml))
-        assert any(
-            f.severity == Severity.ERROR and "target" in f.message.lower()
-            for f in findings
-        )
+        assert any(f.severity == Severity.ERROR and "target" in f.message.lower() for f in findings)
 
 
 class TestFloatingEdges:

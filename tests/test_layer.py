@@ -42,9 +42,7 @@ class TestLayerStructure:
             <mxCell id="bad" value="Not a layer" parent="0" vertex="1"/>
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_layer_structure(_parse(xml))
-        assert any(
-            f.severity == Severity.WARNING and f.cell_id == "bad" for f in findings
-        )
+        assert any(f.severity == Severity.WARNING and f.cell_id == "bad" for f in findings)
 
 
 class TestCrossLayerEdges:
@@ -72,6 +70,4 @@ class TestCrossLayerEdges:
             </mxCell>
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_cross_layer_edges(_parse(xml))
-        assert any(
-            f.severity == Severity.WARNING and f.cell_id == "e1" for f in findings
-        )
+        assert any(f.severity == Severity.WARNING and f.cell_id == "e1" for f in findings)

@@ -39,9 +39,7 @@ class TestGroupDetection:
             </mxCell>
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_group_detection(_parse(xml))
-        assert any(
-            f.severity == Severity.WARNING and f.cell_id == "g1" for f in findings
-        )
+        assert any(f.severity == Severity.WARNING and f.cell_id == "g1" for f in findings)
 
 
 class TestGroupConnectability:
@@ -57,8 +55,7 @@ class TestGroupConnectability:
         </root></mxGraphModel></diagram></mxfile>"""
         findings = check_group_connectability(_parse(xml))
         assert any(
-            f.severity == Severity.WARNING and "group" in f.message.lower()
-            for f in findings
+            f.severity == Severity.WARNING and "group" in f.message.lower() for f in findings
         )
 
     def test_edge_to_non_group_passes(self) -> None:

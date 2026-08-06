@@ -55,9 +55,7 @@ class TestDangerousTags:
             "</root></mxGraphModel></diagram></mxfile>"
         )
         findings = check_dangerous_tags(_parse(xml))
-        assert any(
-            f.severity == Severity.ERROR and f.cell_id == "a" for f in findings
-        )
+        assert any(f.severity == Severity.ERROR and f.cell_id == "a" for f in findings)
 
     def test_iframe_tag_warned(self) -> None:
         xml = (
@@ -69,9 +67,7 @@ class TestDangerousTags:
             "</root></mxGraphModel></diagram></mxfile>"
         )
         findings = check_dangerous_tags(_parse(xml))
-        assert any(
-            f.severity == Severity.ERROR and f.cell_id == "a" for f in findings
-        )
+        assert any(f.severity == Severity.ERROR and f.cell_id == "a" for f in findings)
 
     def test_no_html_mode_skips(self) -> None:
         xml = (
