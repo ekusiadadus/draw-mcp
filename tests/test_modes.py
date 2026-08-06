@@ -1,6 +1,5 @@
 """Tests for validation modes: loose, standard, strict, production."""
 
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import yaml

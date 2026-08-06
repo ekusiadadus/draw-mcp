@@ -16,7 +16,7 @@ import drawio_validator.rules.layer  # noqa: F401
 import drawio_validator.rules.structure  # noqa: F401
 import drawio_validator.rules.style  # noqa: F401
 import drawio_validator.rules.text  # noqa: F401
-from drawio_validator.rules import Mode, get_all_rules, get_rules_for_mode
+from drawio_validator.rules import Mode, get_rules_for_mode
 from drawio_validator.severity import Finding, Severity
 
 

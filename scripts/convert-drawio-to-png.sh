@@ -56,16 +56,16 @@ convert_file() {
     local output_file="${input_file}.${FORMAT}"
 
     # Build drawio command options
-    local opts="-x -f ${FORMAT} -s ${SCALE}"
+    local -a opts=(-x -f "${FORMAT}" -s "${SCALE}")
 
     if [ "${TRANSPARENT}" = "1" ] && [ "${FORMAT}" = "png" ]; then
-        opts="${opts} -t"
+        opts+=(-t)
     fi
 
     echo -e "${YELLOW}Converting:${NC} ${input_file}"
 
     # Run drawio export (suppress stderr warnings)
-    if drawio ${opts} -o "${output_file}" "${input_file}" 2>/dev/null; then
+    if drawio "${opts[@]}" -o "${output_file}" "${input_file}" 2>/dev/null; then
         echo -e "${GREEN}  -> ${output_file}${NC}"
 
         # Add to git staging if in a git repository
