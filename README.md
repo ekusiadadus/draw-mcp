@@ -40,7 +40,7 @@ Validate it in strict mode before finishing.
 ### Install the CLI from GitHub
 
 ```bash
-python -m pip install "git+https://github.com/ekusiadadus/draw-mcp.git"
+python -m pip install "git+https://github.com/ekusiadadus/draw-mcp.git@v2.1.0"
 draw-mcp-validate diagram.drawio --mode strict
 ```
 
