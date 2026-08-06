@@ -11,9 +11,7 @@ license = "MIT"
 dependencies = ["pyyaml>=6.0"]
 requires-python = ">=3.10"
 keywords = ["draw.io", "drawio", "validation", "xml", "diagrams"]
-authors = [
-    { name = "ekusiadadus", email = "ekusiadadus@example.com" },
-]
+authors = [{ name = "Daisuke Kuriyama" }]
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
@@ -36,6 +34,11 @@ dev = [
 
 [project.scripts]
 draw-mcp-validate = "drawio_validator.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ekusiadadus/draw-mcp"
+Repository = "https://github.com/ekusiadadus/draw-mcp"
+Issues = "https://github.com/ekusiadadus/draw-mcp/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/drawio_validator"]

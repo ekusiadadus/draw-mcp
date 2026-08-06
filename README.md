@@ -1,20 +1,63 @@
-# draw-mcp — AI-Generated draw.io XML Quality Standard
+# draw-mcp
 
-A Claude Code skill and CLI validator for generating high-quality draw.io diagrams. 31 validation rules across 10 modules, 4 validation modes, preset system, and CI-ready tooling.
+**Generate and validate production-quality draw.io XML with Claude Code.**
 
-## Positioning
+draw-mcp combines a Claude Code skill with a CLI validator: 31 rules across 10 modules, four validation modes, reusable presets, and CI-ready output. It focuses on the structural and visual defects that syntax-only checks miss.
 
-| Feature | draw-mcp | draw.io MCP Server | Mermaid.js |
-|---------|----------|-------------------|-----------|
-| Output | Native XML | Image/JSON | Text DSL |
-| Layout control | Pixel-perfect | Auto-layout | Auto-layout |
-| Japanese text | Full support | Limited | No control |
-| Validation | 31 rules, 4 modes | None | Syntax only |
-| Presets | YAML-based | None | None |
-| Offline | Yes | Optional | Yes |
-| Best for | Production diagrams | Quick previews | Simple flows |
+[Quick start](#quick-start) · [Validation rules](#validation-rules-31) · [Examples](./examples) · [Specifications](./docs/spec)
 
-**draw-mcp** is a Claude Code XML generation skill with strict validator and style guide. The official draw.io MCP server is complementary (use it for previews, Mermaid, CSV). draw-mcp focuses on **quality** for production diagrams.
+## Why draw-mcp?
+
+AI can generate valid draw.io XML that is still difficult to edit or review: disconnected edges, invalid hierarchy, unsafe HTML, missing fonts, broken containers, and unreadable Japanese labels. draw-mcp turns those quality requirements into executable checks.
+
+| Capability | draw-mcp | draw.io MCP Server | Mermaid.js |
+|---|---|---|---|
+| Output | Native draw.io XML | Image/JSON | Text DSL |
+| Layout control | Explicit and editable | Auto-layout | Auto-layout |
+| Validation | 31 structural and visual rules | None | Syntax only |
+| CJK text checks | Yes | Limited | No layout control |
+| Offline validation | Yes | Optional | Yes |
+| Best fit | Production diagrams and CI | Fast previews | Simple diagrams |
+
+The official draw.io MCP server remains complementary for previews, Mermaid, and CSV workflows. draw-mcp is the quality gate for diagrams that must remain editable and consistent.
+
+## Quick start
+
+### Install the Claude Code plugin
+
+```text
+/plugin marketplace add ekusiadadus/draw-mcp
+/plugin add https://github.com/ekusiadadus/draw-mcp
+```
+
+Then ask Claude Code to create a diagram:
+
+```text
+Create an architecture diagram with application and infrastructure layers.
+Validate it in strict mode before finishing.
+```
+
+### Install the CLI from GitHub
+
+```bash
+python -m pip install "git+https://github.com/ekusiadadus/draw-mcp.git"
+draw-mcp-validate diagram.drawio --mode strict
+```
+
+For local development:
+
+```bash
+git clone https://github.com/ekusiadadus/draw-mcp.git
+cd draw-mcp
+python -m pip install -e ".[dev]"
+pytest
+```
+
+The validator can also emit JSON for CI and automation:
+
+```bash
+draw-mcp-validate diagram.drawio --mode production --format json
+```
 
 ## Supported Features
 
@@ -50,42 +93,6 @@ Features explicitly out of scope:
 - Dark mode / lightbox runtime options
 - Browser tab or editor orchestration
 - Auto-layout (use draw.io's built-in layout engines)
-
-## Quick Start
-
-### Plugin Installation
-
-```bash
-# Via Claude Code marketplace
-/plugin marketplace add ekusiadadus/draw-mcp
-
-# Or install directly
-/plugin add https://github.com/ekusiadadus/draw-mcp
-```
-
-### Manual Installation
-
-```bash
-git clone https://github.com/ekusiadadus/draw-mcp ~/.claude/skills/draw-io
-```
-
-### CLI Validator
-
-```bash
-pip install -e ".[dev]"
-
-# Validate a file (default: standard mode)
-draw-mcp-validate diagram.drawio
-
-# Specify validation mode
-draw-mcp-validate diagram.drawio --mode strict
-
-# JSON output
-draw-mcp-validate diagram.drawio --format json
-
-# Errors only
-draw-mcp-validate diagram.drawio --severity error
-```
 
 ## Usage
 
